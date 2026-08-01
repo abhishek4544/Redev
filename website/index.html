@@ -95,7 +95,7 @@
         <code>npm install -D redev-cli</code>
         <button class="copy-btn" data-copy="npm install -D redev-cli">Copy</button>
       </div>
-      <div class="text-xs text-slate-500">MIT license · Works with any Vite + React project · No API key needed</div>
+      <div class="text-xs text-slate-500">MIT license · Vite + React only · Requires <a class="text-slate-400 hover:text-white underline decoration-slate-700" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a></div>
     </div>
   </div>
 </header>
@@ -189,7 +189,22 @@
   <div class="text-center mb-10">
     <div class="text-xs uppercase tracking-widest text-accentLight font-semibold">Quickstart</div>
     <h2 class="text-3xl md:text-4xl font-bold text-white mt-3">Three commands. Sixty seconds.</h2>
-    <p class="mt-4 text-slate-400">Requires Node 18+, a Vite + React project, and <a class="text-accentLight underline decoration-slate-600 hover:decoration-white" href="https://claude.com/claude-code">Claude Code</a> installed.</p>
+  </div>
+
+  <!-- Prerequisites callout -->
+  <div class="mb-8 rounded-xl border border-yellow-500/40 bg-yellow-500/5 p-5">
+    <div class="flex items-start gap-3">
+      <div class="text-2xl leading-none">⚠️</div>
+      <div class="flex-1">
+        <div class="text-yellow-300 font-semibold mb-2">Before you start, you'll need:</div>
+        <ul class="space-y-1.5 text-slate-300 text-sm">
+          <li>✓ <strong class="text-white">Node 18 or newer</strong> — <code class="text-slate-400 bg-slate-800/60 px-1 rounded">node --version</code> to check</li>
+          <li>✓ A <strong class="text-white">Vite + React</strong> project — Next.js / CRA / Vue / Svelte are not supported yet</li>
+          <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify</li>
+        </ul>
+        <div class="text-slate-400 text-xs mt-3">Missing any of these? The install will succeed but the tool won't do anything useful.</div>
+      </div>
+    </div>
   </div>
 
   <ol class="space-y-6">

@@ -223,10 +223,31 @@
     <li class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
       <div class="flex items-center gap-3 mb-3">
         <span class="text-accentLight font-mono font-bold">02</span>
-        <span class="text-white font-semibold">Add to <code class="text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded text-sm">vite.config.ts</code></span>
+        <span class="text-white font-semibold">Add the plugin to <code class="text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded text-sm">vite.config.ts</code></span>
       </div>
-      <pre class="cmd w-full block whitespace-pre overflow-x-auto"><code>import redev from 'redev-vite-plugin';
-plugins: [redev(), react()]</code></pre>
+      <p class="text-sm text-slate-400 mb-3">Add the <code class="text-slate-300 bg-slate-800 px-1 rounded">import</code> line and add <code class="text-slate-300 bg-slate-800 px-1 rounded">redev()</code> to the <code class="text-slate-300 bg-slate-800 px-1 rounded">plugins</code> array. Keep everything else. Full file:</p>
+      <pre class="cmd w-full block whitespace-pre overflow-x-auto" style="position:relative;padding-right:70px;"><code>import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import redev from 'redev-vite-plugin'   <span class="text-yellow-300">// ← add this</span>
+
+export default defineConfig({
+  plugins: [
+    redev(),                             <span class="text-yellow-300">// ← add this (must be before react)</span>
+    react(),
+  ],
+})</code>
+        <button class="copy-btn" style="position:absolute;top:10px;right:10px;" data-copy="import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import redev from 'redev-vite-plugin'
+
+export default defineConfig({
+  plugins: [
+    redev(),
+    react(),
+  ],
+})">Copy</button>
+      </pre>
+      <p class="text-xs text-slate-500 mt-3">Don't have a <code class="bg-slate-800 px-1 rounded">vite.config.ts</code>? You need a Vite project. Create one: <code class="bg-slate-800 px-1 rounded">npm create vite@latest -- --template react-ts</code></p>
     </li>
 
     <li class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">

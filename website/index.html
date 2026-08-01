@@ -200,7 +200,7 @@
         <ul class="space-y-1.5 text-slate-300 text-sm">
           <li>✓ <strong class="text-white">Node 18 or newer</strong> — <code class="text-slate-400 bg-slate-800/60 px-1 rounded">node --version</code> to check</li>
           <li>✓ A React app of any flavor — <strong class="text-white">Vite (best)</strong> or Next.js / Remix / CRA (via MCP, source-mapping is heuristic)</li>
-          <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify · <a href="#install-claude" class="text-accentLight underline decoration-yellow-600/40">not installed yet?</a></li>
+          <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify · <a href="#install-claude" class="text-accentLight underline decoration-yellow-600/40">how to wire it to Redev →</a></li>
         </ul>
         <div class="text-slate-400 text-xs mt-3">Missing any of these? The install will succeed but the tool won't do anything useful.</div>
       </div>
@@ -272,30 +272,52 @@ export default defineConfig({
   </div>
 
   <div class="grid md:grid-cols-2 gap-4">
-    <details id="install-claude" class="rounded-xl border border-yellow-500/40 bg-yellow-500/5 p-5" open>
+    <details id="install-claude" class="rounded-xl border border-accent/50 bg-accent/5 p-5" open>
       <summary class="flex items-center justify-between text-white font-semibold">
-        <span>Install Claude Code (required)</span>
+        <span>Using Redev inside Claude Code (recommended)</span>
         <span class="chev text-slate-500">▸</span>
       </summary>
-      <div class="mt-4 text-slate-300 text-sm space-y-3">
-        <p>Redev is a shell around Claude Code — Claude does the actual editing. If you don't have it yet:</p>
+      <div class="mt-4 text-slate-300 text-sm space-y-4">
+        <p>Two paths. MCP is the good one — set up once, then every click-to-edit request is picked up automatically inside your existing Claude Code chat. No copy-paste.</p>
 
-        <p><strong>1. Install globally via npm:</strong></p>
-        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>npm install -g @anthropic-ai/claude-code</code></pre>
+        <div>
+          <p class="text-white font-semibold mb-2">1. Register Redev with Claude Code (one-time)</p>
+          <p class="text-slate-400 mb-2">Run this once in any terminal. It writes to <code class="bg-slate-800 px-1 rounded">~/.claude.json</code> — no manual editing.</p>
+          <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp add redev -- npx redev-mcp</code></pre>
+        </div>
 
-        <p><strong>2. Verify it's on your PATH:</strong></p>
-        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude --version</code></pre>
-        <p class="text-slate-400 text-xs">Should print something like <code class="bg-slate-800 px-1 rounded">2.1.x (Claude Code)</code>.</p>
+        <div>
+          <p class="text-white font-semibold mb-2">2. Verify it's registered</p>
+          <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp list</code></pre>
+          <p class="text-slate-400 text-xs mt-2">Look for <code class="bg-slate-800 px-1 rounded">redev: npx redev-mcp (stdio)</code> in the output.</p>
+        </div>
 
-        <p><strong>3. Sign in (first-run only):</strong></p>
-        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude</code></pre>
-        <p class="text-slate-400 text-xs">Opens a browser tab for authentication. You'll need a Claude account (paid subscription for full usage).</p>
+        <div>
+          <p class="text-white font-semibold mb-2">3. Start Redev in your project</p>
+          <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>npx redev</code></pre>
+          <p class="text-slate-400 text-xs mt-2">Leave running. This is what serves the overlay and holds click state.</p>
+        </div>
 
-        <p><strong>4. (Optional, recommended) Add the Redev MCP so Claude Code auto-picks up your click-to-edit requests:</strong></p>
-        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp add redev -- npx redev-mcp</code></pre>
-        <p class="text-slate-400 text-xs">One-time setup. Now any Claude Code chat can answer "is there a pending redev request?" by checking your Redev backend.</p>
+        <div>
+          <p class="text-white font-semibold mb-2">4. Use it — inside your existing Claude Code chat</p>
+          <p class="text-slate-400 mb-2">Open <code class="bg-slate-800 px-1 rounded">claude</code> in your project. Click an element in the browser, submit a prompt in the panel, then in Claude Code chat type:</p>
+          <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>check redev for pending requests</code></pre>
+          <p class="text-slate-400 text-xs mt-2">Claude calls the <code class="bg-slate-800 px-1 rounded">get_pending_request</code> tool, reads your click + prompt, does the edit, calls <code class="bg-slate-800 px-1 rounded">apply_change</code> — your browser reloads.</p>
+        </div>
 
-        <p class="text-slate-400 text-xs mt-3">Official docs & other install methods: <a class="text-accentLight underline decoration-slate-600 hover:decoration-white" href="https://docs.claude.com/claude-code/quickstart" target="_blank" rel="noopener">docs.claude.com/claude-code/quickstart</a></p>
+        <div>
+          <p class="text-white font-semibold mb-2">Tools Redev exposes (Claude picks these automatically)</p>
+          <ul class="space-y-1.5 text-slate-400 text-xs">
+            <li>• <code class="bg-slate-800 px-1 rounded text-slate-300">get_pending_request</code> — read the current click + user prompt</li>
+            <li>• <code class="bg-slate-800 px-1 rounded text-slate-300">apply_change</code> — mark the edit done, reload the browser</li>
+            <li>• <code class="bg-slate-800 px-1 rounded text-slate-300">report_error</code> — tell the user why the request couldn't be satisfied</li>
+          </ul>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800">
+          <p class="text-white font-semibold mb-2">Fallback: no MCP, use copy-paste</p>
+          <p class="text-slate-400 text-xs">If you don't want to register MCP, the panel also shows a shell command you paste into a fresh terminal. Runs Claude Code headless via <code class="bg-slate-800 px-1 rounded">claude -p</code>.</p>
+        </div>
       </div>
     </details>
 

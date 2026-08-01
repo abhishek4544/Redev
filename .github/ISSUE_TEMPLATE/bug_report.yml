@@ -1,0 +1,47 @@
+name: Bug report
+description: Something broke or behaved unexpectedly
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please fill in what you can.
+  - type: input
+    id: version
+    attributes:
+      label: Redev version(s)
+      description: Run `npm ls redev-cli redev-vite-plugin` in your project
+      placeholder: "redev-cli@0.1.2, redev-vite-plugin@0.1.1"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node, Vite, React versions
+      placeholder: "macOS 14, Node 20.11, Vite 5.4, React 18.3"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you see, what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: CLI output
+      description: Paste the full `[Redev]` / `[AgentSpawner]` output
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Sanity checks
+      options:
+        - label: I have Claude Code installed and can run `claude` from my terminal
+        - label: My Vite dev server started successfully
+        - label: The overlay badge appears in my browser

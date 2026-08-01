@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redev Test App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 32px; margin-bottom: 8px; color: #fbbf24; }
+    .subtitle { color: #94a3b8; margin-bottom: 32px; }
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
+    .card h2 { font-size: 20px; margin-bottom: 8px; color: #60a5fa; }
+    .card p { color: #cbd5e1; margin-bottom: 12px; }
+    .btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    .btn-primary { background: #3b82f6; }
+    .btn-danger { background: #ef4444; }
+    .btn-success { background: #10b981; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .grid-item {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #f59e0b;
+      color: #0f172a;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 data-redev-file="test-app.html" data-redev-component="PageTitle" data-redev-line="6">
+      🥔 Redev Test Playground 🚀
+    </h1>
+    <p class="subtitle" data-redev-file="test-app.html" data-redev-component="Subtitle" data-redev-line="7">
+      Press Cmd+Shift+E, then click any element to see it in the CLI
+    </p>
+
+    <div class="card" data-redev-file="components/Card.tsx" data-redev-component="Card" data-redev-line="12">
+      <h2 data-redev-file="components/Card.tsx" data-redev-component="CardTitle" data-redev-line="15">
+        Sample Card
+      </h2>
+      <p data-redev-file="components/Card.tsx" data-redev-component="CardText" data-redev-line="18">
+        This is a card component. Click to select it in the overlay.
+      </p>
+      <button class="btn btn-primary"
+              data-redev-file="components/Button.tsx"
+              data-redev-component="Button"
+              data-redev-line="42">
+        Primary Action
+      </button>
+      <button class="btn btn-danger"
+              data-redev-file="components/Button.tsx"
+              data-redev-component="Button"
+              data-redev-line="42">
+        Delete
+      </button>
+    </div>
+
+    <div class="card" data-redev-file="components/Card.tsx" data-redev-component="Card" data-redev-line="12">
+      <h2 data-redev-file="components/Card.tsx" data-redev-component="CardTitle" data-redev-line="15">
+        Features Grid
+      </h2>
+      <div class="grid">
+        <div class="grid-item"
+             data-redev-file="components/GridItem.tsx"
+             data-redev-component="GridItem"
+             data-redev-line="8">
+          <span class="badge">New</span>
+          <p style="margin-top:8px">Feature One</p>
+        </div>
+        <div class="grid-item"
+             data-redev-file="components/GridItem.tsx"
+             data-redev-component="GridItem"
+             data-redev-line="8">
+          <p>Feature Two</p>
+        </div>
+        <div class="grid-item"
+             data-redev-file="components/GridItem.tsx"
+             data-redev-component="GridItem"
+             data-redev-line="8">
+          <p>Feature Three</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://localhost:5050/redev/overlay.js"></script>
+</body>
+</html>

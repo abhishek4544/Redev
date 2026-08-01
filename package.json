@@ -1,0 +1,16 @@
+{
+  "name": "potatoo-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack web application with React, Node.js, and Python",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install-all": "npm install",
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "start": "npm start --workspace=backend"
+  }
+}

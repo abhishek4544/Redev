@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: npm package (redev-cli)
+    url: https://www.npmjs.com/package/redev-cli
+    about: Install stats, version history
+  - name: npm package (redev-vite-plugin)
+    url: https://www.npmjs.com/package/redev-vite-plugin
+    about: Install stats, version history

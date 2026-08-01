@@ -124,28 +124,43 @@ export class ChangeHandler {
   }
 
   buildInstruction(element, prompt) {
+    const fileKnown = element.file && element.file !== 'unknown';
+    const textHint = element.text ? `**Visible text:** "${String(element.text).slice(0, 120)}"` : null;
+    const xpathHint = element.xpath ? `**XPath:** ${element.xpath}` : null;
+
+    const locate = fileKnown
+      ? [
+          `**File (from redev-vite-plugin):** ${element.file}:${element.line}`,
+          '',
+          `Steps to satisfy this request:`,
+          `1. Read ${element.file}`,
+          `2. Locate the element at line ${element.line} (matches the tag and classes above)`,
+        ]
+      : [
+          `**File:** not known — the app has no redev-vite-plugin (Next.js / Remix / CRA / plain React).`,
+          '',
+          `Steps to satisfy this request:`,
+          `1. Search the codebase for the element. Best signals in order: visible text → unique class combo → tag + parent structure. Try Grep for the text first.`,
+          `2. When you find a candidate file, confirm by reading it and matching against the element hints above. If unsure, ask the user by writing completed.json with an "error" field.`,
+        ];
+
     return [
       `A user clicked a UI element in their running app and asked for a change.`,
       ``,
-      `**Target element:** <${element.tagName}> at ${element.file}:${element.line}`,
-      `**Enclosing component:** ${element.component}`,
-      `**Current classes:** ${element.classes.join(' ') || '(none)'}`,
+      `**Target element:** <${element.tagName}>`,
+      `**Enclosing component:** ${element.component || '(unknown)'}`,
+      `**Current classes:** ${(element.classes || []).join(' ') || '(none)'}`,
+      textHint,
+      xpathHint,
       ``,
       `**User request:** "${prompt}"`,
       ``,
-      `Steps to satisfy this request:`,
-      `1. Read the source file: ${element.file}`,
-      `2. Locate the element at line ${element.line} (should match the tag and classes above)`,
+      ...locate,
       `3. Make the minimal edit that satisfies the request. Prefer Tailwind utilities if the file already uses them. Preserve existing formatting, imports, and component structure.`,
-      `4. After editing, write .redev/completed.json with this shape:`,
-      `   {`,
-      `     "id": "${'${requestId}'}",`,
-      `     "completed_at": "ISO timestamp",`,
-      `     "files_edited": ["${element.file}"],`,
-      `     "summary": "one-line description of what changed"`,
-      `   }`,
-      `5. If you cannot satisfy the request (ambiguous, would require multi-file changes, etc.), write .redev/completed.json with an "error" field explaining why instead of files_edited.`,
-    ].join('\n');
+      `4. Preferred: use the redev MCP tool \`apply_change\` with a one-line summary and the list of files edited — it clears the pending state and reloads the browser.`,
+      `5. Fallback (drop-box mode, no MCP): write .redev/completed.json in the project root with { id, completed_at, files_edited, summary }.`,
+      `6. If you cannot satisfy the request (ambiguous, out of scope), use the redev MCP tool \`report_error\` — or write completed.json with an "error" field.`,
+    ].filter(Boolean).join('\n');
   }
 
   buildAgentPrompt() {

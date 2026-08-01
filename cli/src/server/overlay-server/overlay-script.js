@@ -314,6 +314,11 @@ export const OVERLAY_SCRIPT = `
     const component = el.getAttribute('data-redev-component') || el.tagName.toLowerCase();
     const confidence = file !== 'unknown' ? 0.95 : 0.4;
 
+    // richer hints so MCP-mode agents can find the source file without a bundler plugin
+    const text = (el.innerText || el.textContent || '').trim().slice(0, 200);
+    const xpath = buildXPath(el);
+    const id_attr = el.id || null;
+
     return {
       id: 'sel-' + Date.now(),
       component,
@@ -323,6 +328,9 @@ export const OVERLAY_SCRIPT = `
       tagName: el.tagName.toLowerCase(),
       classes,
       props,
+      text,
+      xpath,
+      elementId: id_attr,
       confidence,
       bounds: {
         top: rect.top,
@@ -331,6 +339,24 @@ export const OVERLAY_SCRIPT = `
         height: rect.height,
       },
     };
+  }
+
+  function buildXPath(el) {
+    if (!el || el === document.body) return '/html/body';
+    if (el.id) return '//*[@id="' + el.id + '"]';
+    const parts = [];
+    let node = el;
+    while (node && node.nodeType === 1 && node !== document.body) {
+      let idx = 1;
+      let sib = node.previousSibling;
+      while (sib) {
+        if (sib.nodeType === 1 && sib.tagName === node.tagName) idx++;
+        sib = sib.previousSibling;
+      }
+      parts.unshift(node.tagName.toLowerCase() + '[' + idx + ']');
+      node = node.parentElement;
+    }
+    return '/html/body/' + parts.join('/');
   }
 
   function onMouseMove(e) {

@@ -305,6 +305,28 @@ plugins: [redev(), react()]</code></pre>
 
     <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
       <summary class="flex items-center justify-between text-white font-semibold">
+        Setup for Next.js (App Router)
+        <span class="chev text-slate-500">▸</span>
+      </summary>
+      <div class="mt-4 text-slate-300 text-sm space-y-3">
+        <p>No plugin needed. Add the overlay script to your root layout, run <code class="bg-slate-800 px-1 rounded">npx redev</code>, and register MCP once.</p>
+        <p><strong>1. Install:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>npm install -D redev-cli</code></pre>
+        <p><strong>2. Add to <code class="bg-slate-800 px-1 rounded">app/layout.tsx</code>:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>{process.env.NODE_ENV === 'development' && (
+  &lt;script async src="http://localhost:5050/redev/overlay.js" /&gt;
+)}</code></pre>
+        <p><strong>3. Add MCP to Claude Code (once, ever):</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp add redev -- npx redev-mcp</code></pre>
+        <p><strong>4. Run:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>npm run dev       # Next dev server
+npx redev         # Redev backend (second terminal)</code></pre>
+        <p>Since Next.js has no bundler plugin, elements don't carry file/line attributes — Claude Code uses element hints (tag, classes, text) to find the source file. Slower and less precise than the Vite plugin, but no config needed.</p>
+      </div>
+    </details>
+
+    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <summary class="flex items-center justify-between text-white font-semibold">
         Terminal-first CLI
         <span class="chev text-slate-500">▸</span>
       </summary>

@@ -73,15 +73,14 @@ export async function startRedevServer({
 
   // MCP-facing endpoints — consumed by the `redev-mcp` stdio server
   app.get('/mcp/pending', (req, res) => {
-    const el = changeHandler.pendingElement;
     const req_ = changeHandler.activeRequest;
-    if (!req_ && !el) return res.json({ pending: null });
+    if (!req_) return res.json({ pending: null });
     res.json({
       pending: {
-        request_id: req_?.id ?? null,
-        element: el ?? req_?.element ?? null,
-        prompt: req_?.prompt ?? null,
-        instruction: req_?.instruction ?? null,
+        request_id: req_.id,
+        element: req_.element,
+        prompt: req_.prompt,
+        instruction: req_.instruction,
         project_root: projectRoot,
       },
     });

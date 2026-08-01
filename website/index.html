@@ -188,7 +188,7 @@
 <section id="install" class="max-w-4xl mx-auto px-6 py-20">
   <div class="text-center mb-10">
     <div class="text-xs uppercase tracking-widest text-accentLight font-semibold">Quickstart</div>
-    <h2 class="text-3xl md:text-4xl font-bold text-white mt-3">Three commands. Sixty seconds.</h2>
+    <h2 class="text-3xl md:text-4xl font-bold text-white mt-3">Two commands. Zero config edits.</h2>
   </div>
 
   <!-- Prerequisites callout -->
@@ -215,53 +215,37 @@
       </div>
       <div class="cmd w-full">
         <span class="prompt">$</span>
-        <code class="flex-1">npm i -D redev-cli redev-vite-plugin</code>
-        <button class="copy-btn" data-copy="npm i -D redev-cli redev-vite-plugin">Copy</button>
+        <code class="flex-1">npm i -D redev-cli</code>
+        <button class="copy-btn" data-copy="npm i -D redev-cli">Copy</button>
       </div>
     </li>
 
     <li class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
       <div class="flex items-center gap-3 mb-3">
         <span class="text-accentLight font-mono font-bold">02</span>
-        <span class="text-white font-semibold">Add the plugin to <code class="text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded text-sm">vite.config.ts</code></span>
-      </div>
-      <p class="text-sm text-slate-400 mb-3">Add the <code class="text-slate-300 bg-slate-800 px-1 rounded">import</code> line and add <code class="text-slate-300 bg-slate-800 px-1 rounded">redev()</code> to the <code class="text-slate-300 bg-slate-800 px-1 rounded">plugins</code> array. Keep everything else. Full file:</p>
-      <pre class="cmd w-full block whitespace-pre overflow-x-auto" style="position:relative;padding-right:70px;"><code>import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import redev from 'redev-vite-plugin'   <span class="text-yellow-300">// ← add this</span>
-
-export default defineConfig({
-  plugins: [
-    redev(),                             <span class="text-yellow-300">// ← add this (must be before react)</span>
-    react(),
-  ],
-})</code>
-        <button class="copy-btn" style="position:absolute;top:10px;right:10px;" data-copy="import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import redev from 'redev-vite-plugin'
-
-export default defineConfig({
-  plugins: [
-    redev(),
-    react(),
-  ],
-})">Copy</button>
-      </pre>
-      <p class="text-xs text-slate-500 mt-3">Don't have a <code class="bg-slate-800 px-1 rounded">vite.config.ts</code>? You need a Vite project. Create one: <code class="bg-slate-800 px-1 rounded">npm create vite@latest -- --template react-ts</code></p>
-    </li>
-
-    <li class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <span class="text-accentLight font-mono font-bold">03</span>
-        <span class="text-white font-semibold">Run <span class="text-slate-400 font-normal">— then <kbd class="font-mono text-slate-200 text-xs bg-slate-800 px-1.5 py-0.5 rounded">Cmd+Shift+E</kbd> in your app</span></span>
+        <span class="text-white font-semibold">Run — with your dev server already running</span>
       </div>
       <div class="cmd w-full">
         <span class="prompt">$</span>
         <code class="flex-1">npx redev</code>
         <button class="copy-btn" data-copy="npx redev">Copy</button>
       </div>
+      <p class="text-sm text-slate-400 mt-3">Redev auto-detects your dev server (Vite, Next.js, Astro, etc.) and starts a proxy at <code class="text-slate-300 bg-slate-800 px-1 rounded">localhost:5050</code> with the overlay pre-injected. No config edits.</p>
+    </li>
+
+    <li class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-accentLight font-mono font-bold">03</span>
+        <span class="text-white font-semibold">Open <code class="text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded text-sm">http://localhost:5050</code></span>
+      </div>
+      <p class="text-sm text-slate-400">Press <kbd class="font-mono text-slate-200 text-xs bg-slate-800 px-1.5 py-0.5 rounded">Cmd+Shift+E</kbd> and click any element. Panel opens — type your change and submit.</p>
     </li>
   </ol>
+
+  <div class="mt-8 rounded-lg border border-slate-800 bg-slate-900/30 p-4 text-sm text-slate-400">
+    <div class="text-white font-semibold mb-1">Using Vite? Optional plugin for faster mapping</div>
+    <p>The proxy works without any bundler plugin. But if you're on Vite, adding <code class="text-slate-300 bg-slate-800 px-1 rounded">redev-vite-plugin</code> makes clicks map directly to source files (skipping the grep step). <a href="#docs" class="text-accentLight underline decoration-slate-700">See docs</a>.</p>
+  </div>
 </section>
 
 <!-- Docs -->

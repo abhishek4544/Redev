@@ -6,6 +6,7 @@ import { OVERLAY_SCRIPT } from './overlay-server/overlay-script.js';
 import { FileService } from './services/FileService.js';
 import { ChangeHandler } from './services/ChangeHandler.js';
 import { AgentSpawner } from './services/AgentSpawner.js';
+import { makeAppProxy, detectDevServer } from './proxy.js';
 
 function isPortFree(port) {
   return new Promise((resolve) => {
@@ -22,7 +23,6 @@ async function pickPort(preferred, log) {
   for (let p = preferred + 1; p < preferred + 50; p++) {
     if (await isPortFree(p)) return p;
   }
-  // OS-assigned fallback
   return 0;
 }
 
@@ -30,6 +30,8 @@ export async function startRedevServer({
   httpPort: preferredHttp = Number(process.env.REDEV_HTTP_PORT) || 5050,
   wsPort: preferredWs = Number(process.env.REDEV_WS_PORT) || 3001,
   projectRoot = process.env.REDEV_PROJECT_ROOT || process.cwd(),
+  proxyTarget = process.env.REDEV_PROXY_TARGET || null, // e.g. 'http://localhost:5173' — null means auto-detect
+  proxyMode = process.env.REDEV_PROXY_MODE !== '0', // default ON, disable with REDEV_PROXY_MODE=0
   log = console.log,
 } = {}) {
   const httpPort = await pickPort(preferredHttp, log);
@@ -40,12 +42,11 @@ export async function startRedevServer({
   app.use(express.json());
 
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'healthy', timestamp: new Date().toISOString(), projectRoot, mode: 'drop-box', httpPort, wsPort });
+    res.json({ status: 'healthy', timestamp: new Date().toISOString(), projectRoot, mode: proxyMode ? 'proxy' : 'standalone', httpPort, wsPort });
   });
 
   app.get('/redev/overlay.js', (req, res) => {
     res.type('application/javascript');
-    // inject actual wsPort so overlay connects to correct backend
     const script = OVERLAY_SCRIPT.replace(
       "'ws://localhost:3001?client=browser'",
       `'ws://localhost:${wsPort}?client=browser'`
@@ -58,20 +59,14 @@ export async function startRedevServer({
     res.send(`<script src="http://localhost:${httpPort}/redev/overlay.js"></script>`);
   });
 
-  const httpServer = app.listen(httpPort, () => {
-    log(`[Redev] HTTP server:  http://localhost:${httpPort}`);
-    log(`[Redev] Overlay:      http://localhost:${httpPort}/redev/overlay.js`);
-  });
-
-  const wsServer = new RedevWebSocketServer(wsPort);
-  wsServer.start();
-
   const fileService = new FileService(projectRoot);
   const agentSpawner = new AgentSpawner({ projectRoot });
+  const wsServer = new RedevWebSocketServer(wsPort);
+  wsServer.start();
   const changeHandler = new ChangeHandler({ wsServer, fileService, agentSpawner });
   changeHandler.register();
 
-  // MCP-facing endpoints — consumed by the `redev-mcp` stdio server
+  // MCP-facing endpoints
   app.get('/mcp/pending', (req, res) => {
     const req_ = changeHandler.activeRequest;
     if (!req_) return res.json({ pending: null });
@@ -85,28 +80,56 @@ export async function startRedevServer({
       },
     });
   });
-
   app.post('/mcp/apply', (req, res) => {
-    const { summary = 'edit applied', files_edited = [] } = req.body || {};
-    changeHandler.completeFromMcp({ summary, files_edited })
-      .then((result) => res.json(result))
-      .catch((err) => res.status(500).json({ error: err.message }));
+    changeHandler.completeFromMcp({ summary: req.body?.summary || 'edit applied', files_edited: req.body?.files_edited || [] })
+      .then((r) => res.json(r)).catch((e) => res.status(500).json({ error: e.message }));
   });
-
   app.post('/mcp/error', (req, res) => {
-    const { error = 'unspecified error' } = req.body || {};
-    changeHandler.failFromMcp(error)
-      .then((result) => res.json(result))
-      .catch((err) => res.status(500).json({ error: err.message }));
+    changeHandler.failFromMcp(req.body?.error || 'unspecified error')
+      .then((r) => res.json(r)).catch((e) => res.status(500).json({ error: e.message }));
   });
 
-  log(`[Redev] Project root: ${projectRoot}`);
-  log(`[Redev] Drop-box:     ${projectRoot}/.redev/{pending,completed}.json`);
+  // PROXY: forward everything else to the user's dev server.
+  // Must be LAST — after all /redev, /mcp, /api routes are registered.
+  let resolvedProxyTarget = null;
+  let sharedProxy = null;
+  if (proxyMode) {
+    if (!proxyTarget) {
+      const detected = await detectDevServer();
+      if (detected) {
+        resolvedProxyTarget = `http://localhost:${detected}`;
+      } else {
+        log(`[Redev] No dev server detected on common ports. Start yours (e.g. \`npm run dev\`) then reload. Or pass --proxy <URL>.`);
+      }
+    } else {
+      resolvedProxyTarget = proxyTarget;
+    }
 
-  if (httpPort !== preferredHttp) {
-    log('');
-    log(`[Redev] ⚠  HTTP moved from ${preferredHttp} → ${httpPort}. If you set backendUrl in redev-vite-plugin, update it:`);
-    log(`         redev({ backendUrl: 'http://localhost:${httpPort}' })`);
+    if (resolvedProxyTarget) {
+      sharedProxy = makeAppProxy({ target: resolvedProxyTarget, overlayPort: httpPort });
+      app.use('/', sharedProxy);
+    }
+  }
+
+  const httpServer = app.listen(httpPort, () => {
+    if (proxyMode && resolvedProxyTarget) {
+      log('');
+      log(`   ┌─────────────────────────────────────────────────────────┐`);
+      log(`   │  🥔 Redev — open http://localhost:${httpPort} to click-to-edit  │`);
+      log(`   └─────────────────────────────────────────────────────────┘`);
+      log(`   Proxying to your dev server at ${resolvedProxyTarget}`);
+      log(`   Press Cmd+Shift+E in the browser to enable the overlay.`);
+    } else {
+      log(`[Redev] HTTP: http://localhost:${httpPort}   WS: ws://localhost:${wsPort}`);
+      log(`[Redev] Project root: ${projectRoot}`);
+    }
+  });
+
+  // Forward user dev-server WS upgrades (e.g. Vite HMR) through the same proxy instance.
+  if (sharedProxy && typeof sharedProxy.upgrade === 'function') {
+    httpServer.on('upgrade', (req, socket, head) => {
+      sharedProxy.upgrade(req, socket, head);
+    });
   }
 
   return {
@@ -114,6 +137,7 @@ export async function startRedevServer({
     wsServer,
     httpPort,
     wsPort,
+    proxyTarget: resolvedProxyTarget,
     stop() {
       wsServer.stop();
       httpServer.close();

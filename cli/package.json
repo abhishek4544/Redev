@@ -1,6 +1,6 @@
 {
   "name": "redev-cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Terminal-first click-to-edit tool. Click any element in your dev app, describe the change, ship it via Claude Code.",
   "keywords": [
     "cli",
@@ -63,6 +63,7 @@
     "cors": "^2.8.6",
     "diff": "^5.2.0",
     "express": "^4.22.2",
+    "http-proxy-middleware": "^4.2.0",
     "ink": "^5.0.1",
     "ink-select-input": "^6.0.0",
     "ink-spinner": "^5.0.0",

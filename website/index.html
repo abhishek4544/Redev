@@ -200,7 +200,7 @@
         <ul class="space-y-1.5 text-slate-300 text-sm">
           <li>✓ <strong class="text-white">Node 18 or newer</strong> — <code class="text-slate-400 bg-slate-800/60 px-1 rounded">node --version</code> to check</li>
           <li>✓ A React app of any flavor — <strong class="text-white">Vite (best)</strong> or Next.js / Remix / CRA (via MCP, source-mapping is heuristic)</li>
-          <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify</li>
+          <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify · <a href="#install-claude" class="text-accentLight underline decoration-yellow-600/40">not installed yet?</a></li>
         </ul>
         <div class="text-slate-400 text-xs mt-3">Missing any of these? The install will succeed but the tool won't do anything useful.</div>
       </div>
@@ -272,6 +272,33 @@ export default defineConfig({
   </div>
 
   <div class="grid md:grid-cols-2 gap-4">
+    <details id="install-claude" class="rounded-xl border border-yellow-500/40 bg-yellow-500/5 p-5" open>
+      <summary class="flex items-center justify-between text-white font-semibold">
+        <span>Install Claude Code (required)</span>
+        <span class="chev text-slate-500">▸</span>
+      </summary>
+      <div class="mt-4 text-slate-300 text-sm space-y-3">
+        <p>Redev is a shell around Claude Code — Claude does the actual editing. If you don't have it yet:</p>
+
+        <p><strong>1. Install globally via npm:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>npm install -g @anthropic-ai/claude-code</code></pre>
+
+        <p><strong>2. Verify it's on your PATH:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude --version</code></pre>
+        <p class="text-slate-400 text-xs">Should print something like <code class="bg-slate-800 px-1 rounded">2.1.x (Claude Code)</code>.</p>
+
+        <p><strong>3. Sign in (first-run only):</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude</code></pre>
+        <p class="text-slate-400 text-xs">Opens a browser tab for authentication. You'll need a Claude account (paid subscription for full usage).</p>
+
+        <p><strong>4. (Optional, recommended) Add the Redev MCP so Claude Code auto-picks up your click-to-edit requests:</strong></p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp add redev -- npx redev-mcp</code></pre>
+        <p class="text-slate-400 text-xs">One-time setup. Now any Claude Code chat can answer "is there a pending redev request?" by checking your Redev backend.</p>
+
+        <p class="text-slate-400 text-xs mt-3">Official docs & other install methods: <a class="text-accentLight underline decoration-slate-600 hover:decoration-white" href="https://docs.claude.com/claude-code/quickstart" target="_blank" rel="noopener">docs.claude.com/claude-code/quickstart</a></p>
+      </div>
+    </details>
+
     <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
       <summary class="flex items-center justify-between text-white font-semibold">
         Configure the Vite plugin

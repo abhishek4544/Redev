@@ -95,7 +95,7 @@
         <code>npm install -D redev-cli</code>
         <button class="copy-btn" data-copy="npm install -D redev-cli">Copy</button>
       </div>
-      <div class="text-xs text-slate-500">MIT license · Vite + React only · Requires <a class="text-slate-400 hover:text-white underline decoration-slate-700" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a></div>
+      <div class="text-xs text-slate-500">MIT license · Any React framework via MCP · Requires <a class="text-slate-400 hover:text-white underline decoration-slate-700" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a></div>
     </div>
   </div>
 </header>
@@ -199,7 +199,7 @@
         <div class="text-yellow-300 font-semibold mb-2">Before you start, you'll need:</div>
         <ul class="space-y-1.5 text-slate-300 text-sm">
           <li>✓ <strong class="text-white">Node 18 or newer</strong> — <code class="text-slate-400 bg-slate-800/60 px-1 rounded">node --version</code> to check</li>
-          <li>✓ A <strong class="text-white">Vite + React</strong> project — Next.js / CRA / Vue / Svelte are not supported yet</li>
+          <li>✓ A React app of any flavor — <strong class="text-white">Vite (best)</strong> or Next.js / Remix / CRA (via MCP, source-mapping is heuristic)</li>
           <li>✓ <strong class="text-white"><a class="text-accentLight underline decoration-yellow-600/40 hover:decoration-white" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in</strong> — run <code class="text-slate-400 bg-slate-800/60 px-1 rounded">claude --version</code> to verify</li>
         </ul>
         <div class="text-slate-400 text-xs mt-3">Missing any of these? The install will succeed but the tool won't do anything useful.</div>
@@ -288,6 +288,18 @@ plugins: [redev(), react()]</code></pre>
         <p>Redev is agent-agnostic. When you submit a change, it writes <code class="bg-slate-800 px-1 rounded">.redev/pending.json</code> at your project root.</p>
         <p>You paste the generated <code class="bg-slate-800 px-1 rounded">claude -p ...</code> command in your terminal. Claude Code reads the pending file, edits your source, and writes <code class="bg-slate-800 px-1 rounded">.redev/completed.json</code>.</p>
         <p>The backend watches for the completed file and reloads your browser. Nothing runs on Redev's servers — everything is local.</p>
+      </div>
+    </details>
+
+    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <summary class="flex items-center justify-between text-white font-semibold">
+        MCP integration (any framework)
+        <span class="chev text-slate-500">▸</span>
+      </summary>
+      <div class="mt-4 text-slate-300 text-sm space-y-3">
+        <p>Register Redev with Claude Code once — then your Claude Code session picks up click-to-edit requests automatically. No shell copy-paste. Works with any React framework (Next.js, Remix, CRA, Vite).</p>
+        <pre class="bg-slate-950 border border-slate-800 rounded p-3 overflow-x-auto"><code>claude mcp add redev -- npx redev-mcp</code></pre>
+        <p>Then in any Claude Code chat, ask "any pending redev requests?" — Claude reads the pending state, edits your source, and reloads your browser.</p>
       </div>
     </details>
 

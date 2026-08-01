@@ -71,6 +71,36 @@ export async function startRedevServer({
   const changeHandler = new ChangeHandler({ wsServer, fileService, agentSpawner });
   changeHandler.register();
 
+  // MCP-facing endpoints — consumed by the `redev-mcp` stdio server
+  app.get('/mcp/pending', (req, res) => {
+    const el = changeHandler.pendingElement;
+    const req_ = changeHandler.activeRequest;
+    if (!req_ && !el) return res.json({ pending: null });
+    res.json({
+      pending: {
+        request_id: req_?.id ?? null,
+        element: el ?? req_?.element ?? null,
+        prompt: req_?.prompt ?? null,
+        instruction: req_?.instruction ?? null,
+        project_root: projectRoot,
+      },
+    });
+  });
+
+  app.post('/mcp/apply', (req, res) => {
+    const { summary = 'edit applied', files_edited = [] } = req.body || {};
+    changeHandler.completeFromMcp({ summary, files_edited })
+      .then((result) => res.json(result))
+      .catch((err) => res.status(500).json({ error: err.message }));
+  });
+
+  app.post('/mcp/error', (req, res) => {
+    const { error = 'unspecified error' } = req.body || {};
+    changeHandler.failFromMcp(error)
+      .then((result) => res.json(result))
+      .catch((err) => res.status(500).json({ error: err.message }));
+  });
+
   log(`[Redev] Project root: ${projectRoot}`);
   log(`[Redev] Drop-box:     ${projectRoot}/.redev/{pending,completed}.json`);
 

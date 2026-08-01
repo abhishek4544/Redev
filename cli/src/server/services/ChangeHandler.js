@@ -251,6 +251,41 @@ export class ChangeHandler {
     await this.fileService.clearPending();
   }
 
+  async completeFromMcp({ summary, files_edited }) {
+    if (!this.activeRequest) {
+      return { ok: false, error: 'No active request. Ask the user to click an element and submit a prompt in the browser panel first.' };
+    }
+    const requestId = this.activeRequest.id;
+    this.clearTimeout();
+    this.agentSpawner?.cancel();
+    await this.fileService.appendLog(`request ${requestId}: completed via MCP — ${summary}`);
+    this.sendCli({
+      type: 'agent-completed',
+      requestId,
+      filesEdited: files_edited || [],
+      summary,
+    });
+    this.sendBrowser({ type: 'reload-requested' });
+    this.activeRequest = null;
+    await this.fileService.clearPending();
+    await this.fileService.clearCompleted();
+    return { ok: true, requestId, summary, filesEdited: files_edited || [] };
+  }
+
+  async failFromMcp(errorMessage) {
+    if (!this.activeRequest) {
+      return { ok: false, error: 'No active request.' };
+    }
+    const requestId = this.activeRequest.id;
+    this.clearTimeout();
+    this.agentSpawner?.cancel();
+    await this.fileService.appendLog(`request ${requestId}: MCP error — ${errorMessage}`);
+    this.sendCli({ type: 'change-generated', error: `Agent could not complete: ${errorMessage}` });
+    this.activeRequest = null;
+    await this.fileService.clearPending();
+    return { ok: true, requestId, error: errorMessage };
+  }
+
   sendCli(message) {
     this.wsServer.broadcastAll(message);
   }

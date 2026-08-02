@@ -112,17 +112,23 @@ export async function startRedevServer({
   }
 
   const httpServer = app.listen(httpPort, () => {
+    const scriptTag = `<script async src="http://localhost:${httpPort}/redev/overlay.js"></script>`;
+    log('');
+    log(`   ┌──────────────────────────────────────────────────────────────┐`);
+    log(`   │  🥔 Redev is running                                         │`);
+    log(`   └──────────────────────────────────────────────────────────────┘`);
+    log('');
+    log(`   Add this ONE line to your app (root layout / index.html):`);
+    log('');
+    log(`     ${scriptTag}`);
+    log('');
+    log(`   Then open YOUR dev URL as usual (e.g. http://localhost:3000,`);
+    log(`   http://localhost:5173) and press Cmd+Shift+E to click-to-edit.`);
     if (proxyMode && resolvedProxyTarget) {
       log('');
-      log(`   ┌─────────────────────────────────────────────────────────┐`);
-      log(`   │  🥔 Redev — open http://localhost:${httpPort} to click-to-edit  │`);
-      log(`   └─────────────────────────────────────────────────────────┘`);
-      log(`   Proxying to your dev server at ${resolvedProxyTarget}`);
-      log(`   Press Cmd+Shift+E in the browser to enable the overlay.`);
-    } else {
-      log(`[Redev] HTTP: http://localhost:${httpPort}   WS: ws://localhost:${wsPort}`);
-      log(`[Redev] Project root: ${projectRoot}`);
+      log(`   (Optional zero-config proxy: http://localhost:${httpPort} → ${resolvedProxyTarget})`);
     }
+    log('');
   });
 
   // Forward user dev-server WS upgrades (e.g. Vite HMR) through the same proxy instance.

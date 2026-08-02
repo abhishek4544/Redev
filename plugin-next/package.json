@@ -1,0 +1,48 @@
+{
+  "name": "redev-next",
+  "version": "0.1.0",
+  "description": "Next.js component that injects the Redev overlay in dev. Pairs with redev-cli for click-to-edit.",
+  "keywords": [
+    "next",
+    "nextjs",
+    "redev",
+    "developer-tools",
+    "click-to-edit",
+    "react"
+  ],
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "abhishek4544",
+  "license": "MIT",
+  "homepage": "https://github.com/abhishek4544/Redev#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhishek4544/Redev.git",
+    "directory": "plugin-next"
+  },
+  "bugs": {
+    "url": "https://github.com/abhishek4544/Redev/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "react": ">=18.0.0"
+  }
+}

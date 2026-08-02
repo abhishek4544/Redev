@@ -341,6 +341,154 @@ export const OVERLAY_SCRIPT = `
     };
   }
 
++  function showCompactElementPanel(el) {
+    if (!panel) return;
+    const styles = el.computedStyle || {};
+    const changed = {};
+    let promptDirty = false;
+    const panelStyle = {
+      top: '12px',
+      right: '12px',
+      bottom: '12px',
+      width: 'min(380px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      height: 'calc(100vh - 24px)',
+      maxHeight: 'calc(100vh - 24px)',
+      overflow: 'hidden',
+      borderRadius: '14px',
+      background: '#1f1f1f',
+      color: '#f5f5f5',
+      fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
+      fontSize: '13px',
+      lineHeight: '1.35',
+      border: '1px solid #3f3f46',
+      boxShadow: '0 20px 60px rgba(0,0,0,.42)',
+    };
+    Object.assign(panel.style, panelStyle);
+
+    function hexColor(value) {
+      const hex = colorText(value);
+      return /^#[0-9A-F]{6}$/i.test(hex) ? hex.toLowerCase() : '#ffffff';
+    }
+    function valueFor(key) {
+      return styles[key] || '';
+    }
+    function inputField(label, key, type) {
+      const value = valueFor(key);
+      const inputType = type || 'text';
+      const inputValue = inputType === 'color' ? hexColor(value) : value;
+      const style = inputType === 'color'
+        ? 'width:100%;height:34px;padding:3px;border:1px solid #45454d;border-radius:7px;background:#2b2b2f;cursor:pointer;'
+        : 'width:100%;box-sizing:border-box;height:34px;padding:0 9px;border:1px solid #45454d;border-radius:7px;background:#2b2b2f;color:#f5f5f5;font:inherit;outline:none;';
+      return '<label style="display:flex;flex-direction:column;gap:5px;min-width:0;">' +
+        '<span style="font-size:11px;color:#a1a1aa;">' + esc(label) + '</span>' +
+        '<input data-redev-style="' + esc(key) + '" type="' + inputType + '" value="' + esc(inputValue) + '" style="' + style + '" /></label>';
+    }
+    function selectField(label, key, options) {
+      const current = valueFor(key);
+      return '<label style="display:flex;flex-direction:column;gap:5px;min-width:0;">' +
+        '<span style="font-size:11px;color:#a1a1aa;">' + esc(label) + '</span>' +
+        '<select data-redev-style="' + esc(key) + '" style="width:100%;box-sizing:border-box;height:34px;padding:0 7px;border:1px solid #45454d;border-radius:7px;background:#2b2b2f;color:#f5f5f5;font:inherit;outline:none;">' +
+        options.map((option) => '<option value="' + esc(option) + '"' + (option === current ? ' selected' : '') + '>' + esc(option) + '</option>').join('') +
+        '</select></label>';
+    }
+    function section(title, content) {
+      return '<section style="padding:14px 15px;border-bottom:1px solid #34343a;">' +
+        '<div style="margin-bottom:10px;font-size:12px;font-weight:700;color:#f4f4f5;">' + esc(title) + '</div>' + content + '</section>';
+    }
+    function grid(content) {
+      return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' + content + '</div>';
+    }
+    function promptText() {
+      const entries = Object.keys(changed);
+      const summary = entries.length
+        ? entries.map((key) => key + ': ' + changed[key]).join('; ')
+        : 'the selected element’s visual styling';
+      return 'Update ' + selectorFor(el) + ' in ' + (el.file || 'the source file') + ': ' + summary + '. Keep the rest of the component unchanged.';
+    }
+    function updatePrompt() {
+      const prompt = panel.querySelector('#__redev_prompt__');
+      if (prompt && !promptDirty) prompt.value = promptText();
+      const count = panel.querySelector('#__redev_change_count__');
+      if (count) {
+        const total = Object.keys(changed).length;
+        count.textContent = total ? total + ' pending style change' + (total === 1 ? '' : 's') : 'Preview changes, then send them to your agent';
+      }
+    }
+    function applyStyle(key, rawValue) {
+      let value = rawValue;
+      const pixelKeys = ['fontSize', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'gap'];
+      if (pixelKeys.indexOf(key) !== -1 && value && /^-?\d+(\.\d+)?$/.test(value)) value += 'px';
+      el.style[key] = value;
+      styles[key] = value;
+      changed[key] = value;
+      updatePrompt();
+    }
+
+    const typography = grid(
+      inputField('Font family', 'fontFamily') +
+      selectField('Weight', 'fontWeight', ['300', '400', '500', '600', '700', '800']) +
+      inputField('Font size', 'fontSize') +
+      inputField('Line height', 'lineHeight') +
+      inputField('Letter spacing', 'letterSpacing') +
+      selectField('Text align', 'textAlign', ['left', 'center', 'right', 'justify'])
+    );
+    const spacing = grid(
+      inputField('Padding top', 'paddingTop') +
+      inputField('Padding right', 'paddingRight') +
+      inputField('Padding bottom', 'paddingBottom') +
+      inputField('Padding left', 'paddingLeft') +
+      inputField('Gap', 'gap') +
+      selectField('Display', 'display', ['block', 'flex', 'grid', 'inline-flex', 'inline-block', 'none'])
+    );
+    const layout = grid(
+      selectField('Justify', 'justifyContent', ['normal', 'flex-start', 'center', 'flex-end', 'space-between', 'space-around']) +
+      selectField('Align items', 'alignItems', ['normal', 'stretch', 'flex-start', 'center', 'flex-end']) +
+      inputField('Width', 'width') +
+      inputField('Height', 'height')
+    );
+    const surface = grid(
+      inputField('Text color', 'color', 'color') +
+      inputField('Background', 'backgroundColor', 'color') +
+      inputField('Radius', 'borderRadius') +
+      inputField('Border', 'border')
+    );
+
+    panel.style.display = 'block';
+    panel.innerHTML =
+      '<div style="height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 15px;border-bottom:1px solid #34343a;background:#252529;position:sticky;top:0;z-index:2;">' +
+      '<div style="min-width:0;"><div style="font-size:10px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.12em;">Selected element</div><div style="margin-top:3px;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(selectorFor(el)) + '</div></div>' +
+      '<button id="__redev_close__" aria-label="Close inspector" style="width:30px;height:30px;border:0;border-radius:7px;background:#34343a;color:#d4d4d8;font-size:18px;cursor:pointer;">×</button></div>' +
+      '<div id="__redev_inspector_scroll__" style="height:calc(100% - 198px);overflow:auto;">' +
+      section('Typography', typography) +
+      section('Spacing', spacing) +
+      section('Layout', layout) +
+      section('Surface', surface) +
+      '<section style="padding:14px 15px;"><details><summary style="cursor:pointer;color:#a1a1aa;font-size:11px;">Source context</summary><div style="margin-top:8px;color:#a1a1aa;word-break:break-word;">' + esc(el.file) + ':' + esc(el.line) + '<br />' + esc(el.classes && el.classes.join(' ') || '') + '</div></details></section></div>' +
+      '<div style="height:140px;box-sizing:border-box;padding:10px 15px 12px;border-top:1px solid #3f3f46;background:#252529;position:absolute;left:0;right:0;bottom:0;">' +
+      '<div id="__redev_change_count__" style="margin-bottom:5px;font-size:10px;color:#a1a1aa;">Preview changes, then send them to your agent</div>' +
+      '<textarea id="__redev_prompt__" rows="2" style="width:100%;height:49px;box-sizing:border-box;resize:none;padding:8px;border:1px solid #45454d;border-radius:7px;background:#2b2b2f;color:#f4f4f5;font:12px/1.35 ui-sans-serif,system-ui,sans-serif;outline:none;" placeholder="Describe a change manually or edit the generated request"></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:8px;"><button id="__redev_submit__" style="flex:1;height:32px;border:0;border-radius:7px;background:#f4f4f5;color:#18181b;font-size:12px;font-weight:700;cursor:pointer;">Send to agent</button><button id="__redev_reset_prompt__" style="height:32px;padding:0 10px;border:1px solid #45454d;border-radius:7px;background:#2b2b2f;color:#d4d4d8;font-size:11px;cursor:pointer;">Auto</button></div></div>';
+
+    panel.querySelectorAll('[data-redev-style]').forEach((input) => {
+      input.addEventListener('input', () => applyStyle(input.getAttribute('data-redev-style'), input.value));
+      input.addEventListener('change', () => applyStyle(input.getAttribute('data-redev-style'), input.value));
+    });
+    panel.querySelector('#__redev_prompt__').addEventListener('input', () => { promptDirty = true; });
+    panel.querySelector('#__redev_reset_prompt__').onclick = () => { promptDirty = false; updatePrompt(); };
+    panel.querySelector('#__redev_submit__').onclick = () => {
+      const prompt = panel.querySelector('#__redev_prompt__').value.trim();
+      if (!prompt) return;
+      send({ type: 'change-request', prompt });
+      showBusy('Writing pending.json...');
+    };
+    panel.querySelector('#__redev_close__').onclick = () => {
+      panel.style.display = 'none';
+      selectedElement = null;
+    };
+    updatePrompt();
+  }
+
   function showBusy(text) {
     if (!panel) return;
     panel.innerHTML = '<div style="padding:14px;"><div style="font-size:13px; color:#f1f5f9;">' + esc(text) + '</div></div>';
@@ -570,7 +718,7 @@ export const OVERLAY_SCRIPT = `
     overlayEnabled = false;
     hideHighlight();
     updateStatus('cli-ready');
-    showElementPanel(selectedElement);
+    showCompactElementPanel(selectedElement);
   }
 
   function onKeyDown(e) {

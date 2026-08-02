@@ -193,9 +193,9 @@ function scoreCandidate({ probe, listener, profile }) {
  * Redev. This is intentionally conservative: callers should only auto-attach
  * to `recommendation`, and present `candidates` when it is null.
  */
-export async function discoverLocalApps({ projectRoot = process.cwd() } = {}) {
+export async function discoverLocalApps({ projectRoot = process.cwd(), listeners: providedListeners = null } = {}) {
   const profile = readProjectProfile(projectRoot);
-  const listeners = discoverListeners();
+  const listeners = providedListeners || discoverListeners();
   const listenersByPort = new Map();
   for (const listener of listeners) {
     for (const port of listener.ports) listenersByPort.set(port, listener);

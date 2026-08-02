@@ -10,6 +10,7 @@ export const OVERLAY_SCRIPT = `
   let selectedElement = null;
   let statusBadge = null;
   let panel = null;
+  let hoverCard = null;
 
   function connect() {
     ws = new WebSocket(WS_URL);
@@ -68,7 +69,7 @@ export const OVERLAY_SCRIPT = `
       fontFamily: 'ui-monospace, monospace',
       fontSize: '12px',
       borderRadius: '6px',
-      zIndex: '2147483646',
+      zIndex: '2147483647',
       pointerEvents: 'none',
       boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
     });
@@ -114,6 +115,81 @@ export const OVERLAY_SCRIPT = `
     return highlight;
   }
 
+  function createHoverCard() {
+    const card = document.createElement('div');
+    card.id = '__redev_hover_card__';
+    Object.assign(card.style, {
+      position: 'fixed', display: 'none', width: '280px', maxWidth: 'calc(100vw - 24px)',
+      background: '#ffffff', color: '#111827', border: '1px solid #d7dee8', borderRadius: '10px',
+      overflow: 'hidden', boxShadow: '0 12px 28px rgba(15,23,42,0.22)',
+      fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif', fontSize: '12px', lineHeight: '1.4',
+      zIndex: '2147483647', pointerEvents: 'none',
+    });
+    document.body.appendChild(card);
+    return card;
+  }
+
+  function colorText(value) {
+    if (!value || value === 'transparent' || value === 'rgba(0, 0, 0, 0)') return 'none';
+    const match = value.match(/^rgba?\\(([^)]+)\\)$/);
+    if (!match) return value;
+    const parts = match[1].split(',').map((part) => parseFloat(part.trim()));
+    if (parts.length < 3 || parts.some((part, index) => index < 3 && Number.isNaN(part))) return value;
+    return '#' + parts.slice(0, 3).map((part) => Math.max(0, Math.min(255, Math.round(part))).toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  function colorValue(value) {
+    const label = colorText(value);
+    if (label === 'none') return '<span style="color:#6b7280;">none</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' +
+      '<span style="display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid #9ca3af;background:' + esc(label) + ';"></span>' +
+      '<span>' + esc(label) + '</span></span>';
+  }
+
+  function hoverField(label, value) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;">' +
+      '<span style="color:#6b7280;">' + esc(label) + '</span><span style="color:#111827;font-weight:500;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + value + '</span>' +
+      '</div>';
+  }
+
+  function selectorFor(el) {
+    const tag = el.tagName ? el.tagName.toLowerCase() : 'element';
+    const className = typeof el.className === 'string' ? el.className.trim().split(/\\s+/).filter(Boolean).slice(0, 2) : [];
+    return tag + (className.length ? '.' + className.join('.') : '');
+  }
+
+  function showHoverCard(el) {
+    if (!hoverCard || !el || el === document.body || el === document.documentElement) return;
+    const rect = el.getBoundingClientRect();
+    const computed = window.getComputedStyle(el);
+    hoverCard.innerHTML =
+      '<div style="padding:10px 12px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;">' +
+      '  <div style="font-size:11px;color:#374151;font-weight:700;">Redev · hover to inspect</div>' +
+      '  <div style="margin-top:5px;color:#111827;font-size:15px;font-weight:700;word-break:break-word;">' + esc(selectorFor(el)) + '</div>' +
+      '  <div style="margin-top:2px;color:#6b7280;">' + Math.round(rect.width) + ' × ' + Math.round(rect.height) + '</div>' +
+      '</div>' +
+      '<div style="padding:10px 12px;">' +
+      hoverField('Text color', colorValue(computed.color)) +
+      hoverField('Background', colorValue(computed.backgroundColor)) +
+      hoverField('Font family', esc(computed.fontFamily)) +
+      hoverField('Font size', esc(computed.fontSize)) +
+      '</div>';
+    hoverCard.style.display = 'block';
+    const cardWidth = Math.min(280, window.innerWidth - 24);
+    hoverCard.style.width = cardWidth + 'px';
+    const cardRect = hoverCard.getBoundingClientRect();
+    let left = Math.max(12, Math.min(rect.left, window.innerWidth - cardRect.width - 12));
+    let top = rect.bottom + 12;
+    if (top + cardRect.height > window.innerHeight - 12) top = rect.top - cardRect.height - 12;
+    top = Math.max(12, Math.min(top, window.innerHeight - cardRect.height - 12));
+    hoverCard.style.left = left + 'px';
+    hoverCard.style.top = top + 'px';
+  }
+
+  function hideHoverCard() {
+    if (hoverCard) hoverCard.style.display = 'none';
+  }
+
   function positionHighlight(el) {
     if (!currentHighlight || !el) return;
     const rect = el.getBoundingClientRect();
@@ -142,7 +218,9 @@ export const OVERLAY_SCRIPT = `
       position: 'fixed',
       top: '20px',
       right: '20px',
-      width: '360px',
+      width: '420px',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100vh - 40px)',
       background: '#0f172a',
       color: '#e2e8f0',
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
@@ -153,7 +231,7 @@ export const OVERLAY_SCRIPT = `
       boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
       border: '1px solid #334155',
       display: 'none',
-      overflow: 'hidden',
+      overflow: 'auto',
     });
     document.body.appendChild(p);
     return p;
@@ -161,16 +239,76 @@ export const OVERLAY_SCRIPT = `
 
   function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+  function styleField(label, value, swatch) {
+    const safeValue = value && value !== 'normal' ? value : '—';
+    const colorSwatch = swatch && swatch !== 'transparent' && swatch !== 'rgba(0, 0, 0, 0)'
+      ? '<span style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;border:1px solid #64748b;vertical-align:-1px;background:' + esc(swatch) + ';"></span>'
+      : '';
+    return '<div style="min-width:0;padding:7px 8px;border:1px solid #334155;border-radius:6px;background:#111c31;">' +
+      '<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;">' + esc(label) + '</div>' +
+      '<div style="margin-top:2px;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + colorSwatch + esc(safeValue) + '</div>' +
+      '</div>';
+  }
+
+  function styleSection(title, fields) {
+    return '<div style="margin-top:10px;">' +
+      '<div style="margin-bottom:6px;font-size:11px;color:#cbd5e1;font-weight:600;letter-spacing:.05em;text-transform:uppercase;">' + esc(title) + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' + fields.join('') + '</div>' +
+      '</div>';
+  }
+
   function showElementPanel(el) {
     if (!panel) return;
+    const styles = el.computedStyle || {};
+    const selectedKind = el.selectionKind === 'content' ? 'content' : 'container';
+    const styleSnapshot =
+      '<div style="padding:12px 14px;border-bottom:1px solid #334155;background:#0f1b30;">' +
+      '  <div style="display:flex;align-items:center;justify-content:space-between;">' +
+      '    <div style="font-size:11px;color:#94a3b8;letter-spacing:.05em;text-transform:uppercase;">Style snapshot</div>' +
+      '    <span style="font-size:10px;color:#94a3b8;padding:3px 6px;border:1px solid #334155;border-radius:999px;">' + esc(selectedKind) + '</span>' +
+      '  </div>' +
+      styleSection('Typography', [
+        styleField('Font family', styles.fontFamily),
+        styleField('Weight', styles.fontWeight),
+        styleField('Size', styles.fontSize),
+        styleField('Line height', styles.lineHeight),
+        styleField('Letter spacing', styles.letterSpacing),
+        styleField('Alignment', styles.textAlign),
+      ]) +
+      styleSection('Layout & spacing', [
+        styleField('Display', styles.display),
+        styleField('Position', styles.position),
+        styleField('Width', styles.width),
+        styleField('Height', styles.height),
+        styleField('Padding top', styles.paddingTop),
+        styleField('Padding right', styles.paddingRight),
+        styleField('Padding bottom', styles.paddingBottom),
+        styleField('Padding left', styles.paddingLeft),
+        styleField('Margin top', styles.marginTop),
+        styleField('Margin bottom', styles.marginBottom),
+        styleField('Gap', styles.gap),
+        styleField('Top', styles.top),
+        styleField('Right', styles.right),
+        styleField('Bottom', styles.bottom),
+        styleField('Left', styles.left),
+        styleField('Content position', (styles.justifyContent || '—') + ' / ' + (styles.alignItems || '—')),
+      ]) +
+      styleSection('Surface', [
+        styleField('Background', styles.backgroundColor, styles.backgroundColor),
+        styleField('Text color', styles.color, styles.color),
+        styleField('Radius', styles.borderRadius),
+        styleField('Border', styles.border),
+      ]) +
+      '</div>';
     panel.style.display = 'block';
     panel.innerHTML =
       '<div style="padding:12px 14px; border-bottom:1px solid #334155; background:#1e293b;">' +
       '  <div style="font-size:11px; color:#94a3b8; letter-spacing:.05em; text-transform:uppercase;">Selected element</div>' +
       '  <div style="margin-top:4px; font-size:14px; color:#f1f5f9;"><strong>' + esc(el.component) + '</strong> <span style="color:#64748b;">&lt;' + esc(el.tagName) + '&gt;</span></div>' +
       '  <div style="color:#94a3b8; margin-top:2px;">' + esc(el.file) + ':' + esc(el.line) + '</div>' +
-      (el.classes && el.classes.length ? '  <div style="color:#94a3b8; margin-top:4px; word-break:break-all;">' + esc(el.classes.join(' ')) + '</div>' : '') +
       '</div>' +
+      styleSnapshot +
+      (el.classes && el.classes.length ? '<details style="padding:9px 14px;border-bottom:1px solid #334155;"><summary style="cursor:pointer;color:#94a3b8;font-size:11px;">Source classes</summary><div style="margin-top:6px;color:#94a3b8;word-break:break-all;line-height:1.45;">' + esc(el.classes.join(' ')) + '</div></details>' : '') +
       '<div style="padding:12px 14px;">' +
       '  <label style="display:block; font-size:11px; color:#94a3b8; letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px;">Describe the change</label>' +
       '  <textarea id="__redev_prompt__" rows="3" style="width:100%; box-sizing:border-box; background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:6px; padding:8px; font-family:inherit; font-size:12px; resize:vertical;" placeholder="e.g. make the padding larger and background red"></textarea>' +
@@ -275,6 +413,39 @@ export const OVERLAY_SCRIPT = `
     const component = el.getAttribute('data-redev-component') || el.tagName.toLowerCase();
     const confidence = file !== 'unknown' ? 0.95 : 0.4;
 
+    const computed = window.getComputedStyle(el);
+    const hasDirectText = Array.from(el.childNodes || []).some((node) => node.nodeType === 3 && (node.textContent || '').trim());
+    const contentTag = /^(A|BUTTON|CODE|EM|H1|H2|H3|H4|H5|H6|LABEL|LI|P|SMALL|SPAN|STRONG|TEXTAREA)$/.test(el.tagName);
+    const computedStyle = {
+      fontFamily: computed.fontFamily,
+      fontSize: computed.fontSize,
+      fontWeight: computed.fontWeight,
+      lineHeight: computed.lineHeight,
+      letterSpacing: computed.letterSpacing,
+      textAlign: computed.textAlign,
+      color: computed.color,
+      backgroundColor: computed.backgroundColor,
+      display: computed.display,
+      position: computed.position,
+      width: Math.round(rect.width * 100) / 100 + 'px',
+      height: Math.round(rect.height * 100) / 100 + 'px',
+      paddingTop: computed.paddingTop,
+      paddingRight: computed.paddingRight,
+      paddingBottom: computed.paddingBottom,
+      paddingLeft: computed.paddingLeft,
+      marginTop: computed.marginTop,
+      marginBottom: computed.marginBottom,
+      gap: computed.gap,
+      top: computed.top,
+      right: computed.right,
+      bottom: computed.bottom,
+      left: computed.left,
+      justifyContent: computed.justifyContent,
+      alignItems: computed.alignItems,
+      borderRadius: computed.borderRadius,
+      border: computed.border,
+    };
+
     return {
       id: 'sel-' + Date.now(),
       component,
@@ -285,6 +456,8 @@ export const OVERLAY_SCRIPT = `
       classes,
       props,
       confidence,
+      selectionKind: hasDirectText || contentTag ? 'content' : 'container',
+      computedStyle,
       bounds: {
         top: rect.top,
         left: rect.left,
@@ -295,10 +468,11 @@ export const OVERLAY_SCRIPT = `
   }
 
   function onMouseMove(e) {
-    if (!overlayEnabled) return;
+    if (!overlayEnabled) { hideHoverCard(); return; }
     const el = e.target;
-    if (isOverlayElement(el)) return;
+    if (!(el instanceof Element) || isOverlayElement(el)) { hideHoverCard(); return; }
     positionHighlight(el);
+    showHoverCard(el);
   }
 
   function onClick(e) {
@@ -308,6 +482,7 @@ export const OVERLAY_SCRIPT = `
 
     e.preventDefault();
     e.stopPropagation();
+    hideHoverCard();
 
     selectedElement = extractElementData(el);
     console.log('[Redev] Selected:', selectedElement);
@@ -332,6 +507,7 @@ export const OVERLAY_SCRIPT = `
         send({ type: 'overlay-enabled' });
       } else {
         hideHighlight();
+        hideHoverCard();
         updateStatus('disabled');
         send({ type: 'overlay-disabled' });
       }
@@ -345,6 +521,7 @@ export const OVERLAY_SCRIPT = `
     }
     statusBadge = createStatusBadge();
     currentHighlight = createHighlight();
+    hoverCard = createHoverCard();
     panel = createPanel();
     document.addEventListener('mousemove', onMouseMove, true);
     document.addEventListener('click', onClick, true);

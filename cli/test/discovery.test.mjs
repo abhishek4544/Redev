@@ -45,6 +45,7 @@ async function startFixture(projectRoot, kind) {
 
   return {
     port,
+    listener: { pid: String(child.pid), command: 'node -e fixture-server', cwd: projectRoot, ports: [port] },
     async stop() {
       child.kill();
       await once(child, 'exit');
@@ -60,7 +61,7 @@ test('selects the Next-like server belonging to the current project', { concurre
   const root = await makeProject('next-current', { next: '16.0.0' });
   const fixture = await startFixture(root, 'next');
   try {
-    const result = await discoverLocalApps({ projectRoot: root });
+    const result = await discoverLocalApps({ projectRoot: root, listeners: [fixture.listener] });
     assert.equal(result.recommendation?.port, fixture.port, JSON.stringify(result.candidates));
     assert.equal(result.recommendation?.framework, 'Next.js');
     assert.equal(result.recommendation?.confidence, 100);
@@ -75,7 +76,7 @@ test('does not silently choose when two apps belong to the same project', { conc
   const nextFixture = await startFixture(root, 'next');
   const viteFixture = await startFixture(root, 'vite');
   try {
-    const result = await discoverLocalApps({ projectRoot: root });
+    const result = await discoverLocalApps({ projectRoot: root, listeners: [nextFixture.listener, viteFixture.listener] });
     const fixturePorts = new Set([nextFixture.port, viteFixture.port]);
     assert.equal(result.recommendation, null);
     assert.equal(result.candidates.filter((candidate) => fixturePorts.has(candidate.port)).length, 2);
@@ -92,7 +93,7 @@ test('prefers the current project over another project on the same machine', { c
   const currentFixture = await startFixture(currentRoot, 'next');
   const otherFixture = await startFixture(otherRoot, 'next');
   try {
-    const result = await discoverLocalApps({ projectRoot: currentRoot });
+    const result = await discoverLocalApps({ projectRoot: currentRoot, listeners: [currentFixture.listener, otherFixture.listener] });
     assert.equal(result.recommendation?.port, currentFixture.port, JSON.stringify(result.candidates));
     const otherCandidate = result.candidates.find((candidate) => candidate.port === otherFixture.port);
     assert.ok(otherCandidate);
@@ -110,7 +111,7 @@ test('restores a unique saved app identity without persisting its port', { concu
   const nextFixture = await startFixture(root, 'next');
   const viteFixture = await startFixture(root, 'vite');
   try {
-    const result = await discoverLocalApps({ projectRoot: root });
+    const result = await discoverLocalApps({ projectRoot: root, listeners: [nextFixture.listener, viteFixture.listener] });
     const nextCandidate = result.candidates.find((candidate) => candidate.port === nextFixture.port);
     assert.ok(nextCandidate);
     saveProjectSession(result.profile.root, nextCandidate);
@@ -131,7 +132,7 @@ test('does not restore a saved session when two current apps share its identity'
   const firstFixture = await startFixture(root, 'next');
   const secondFixture = await startFixture(root, 'next');
   try {
-    const result = await discoverLocalApps({ projectRoot: root });
+    const result = await discoverLocalApps({ projectRoot: root, listeners: [firstFixture.listener, secondFixture.listener] });
     const firstCandidate = result.candidates.find((candidate) => candidate.port === firstFixture.port);
     assert.ok(firstCandidate);
     saveProjectSession(result.profile.root, firstCandidate);
@@ -148,7 +149,7 @@ test('does not restore a session whose process belongs to another project', { co
   const otherRoot = await makeProject('session-other', { next: '16.0.0' });
   const otherFixture = await startFixture(otherRoot, 'next');
   try {
-    const otherResult = await discoverLocalApps({ projectRoot: otherRoot });
+    const otherResult = await discoverLocalApps({ projectRoot: otherRoot, listeners: [otherFixture.listener] });
     const otherCandidate = otherResult.candidates.find((candidate) => candidate.port === otherFixture.port);
     assert.ok(otherCandidate);
     saveProjectSession(currentRoot, otherCandidate);

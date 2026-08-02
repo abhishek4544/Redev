@@ -8,6 +8,39 @@ import { discoverLocalApps } from './server/discovery.js';
 import { findSessionCandidate, loadProjectSession, saveProjectSession } from './server/session.js';
 
 const args = process.argv.slice(2);
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(`
+Redev — click any element in your dev app, describe the change, ship it.
+
+Usage:
+  npx redev-cli [options]
+  npx redev-cli doctor
+
+Options:
+  --app <url>         Dev server URL to attach to (e.g. http://localhost:3000)
+  --port <n>          HTTP port for the Redev proxy (default: 5050)
+  --ws-port <n>       WebSocket port (default: 3001)
+  --demo              Run the UI in demo mode without a dev server
+  --no-server         Skip starting the proxy (advanced)
+  doctor              List detected local apps and why each was or wasn't picked
+  -h, --help          Show this help
+
+Docs: https://github.com/abhishek4544/Redev
+`);
+  process.exit(0);
+}
+
+if (args.includes('--version') || args.includes('-v')) {
+  const { readFileSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const { dirname, join } = await import('node:path');
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pkg = JSON.parse(readFileSync(join(here, '..', 'package.json'), 'utf8'));
+  console.log(pkg.version);
+  process.exit(0);
+}
+
 const demo = args.includes('--demo');
 const noServer = args.includes('--no-server');
 const doctor = args[0] === 'doctor' || args.includes('--doctor');
@@ -42,7 +75,12 @@ async function chooseApp() {
     throw new Error('No local browser app matched this project. Start your dev server or pass --app http://localhost:<port>.');
   }
   if (!process.stdin.isTTY) {
-    throw new Error('Several local apps are plausible. Run with --app http://localhost:<port> to select one.');
+    const list = discovery.candidates
+      .map((c) => `    ${c.framework} — ${c.baseUrl}`)
+      .join('\n');
+    throw new Error(
+      `Several local apps look plausible:\n${list}\n\nRe-run with --app <url>, e.g. --app ${discovery.candidates[0]!.baseUrl}`,
+    );
   }
 
   console.log('\n? Which app should Redev edit?\n');
@@ -59,6 +97,7 @@ async function chooseApp() {
   return selected;
 }
 
+try {
 if (doctor) {
   const discovery = await discoverLocalApps({ projectRoot: process.cwd() });
   console.log(`\nRedev doctor\n`);
@@ -95,4 +134,9 @@ if (doctor) {
   }
 
   render(<App demo={demo} wsPort={activeWsPort} />);
+}
+} catch (err) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(`\n✗ ${message}\n`);
+  process.exit(1);
 }

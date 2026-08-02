@@ -475,6 +475,7 @@ export default function HomePage() {
               ⌁
             </span>{" "}
             redev · MIT · no cloud
+            <span className="ml-2 text-[#85827a]">Credit: Abhishek Thapa</span>
           </div>
           <div className="flex gap-5">
             <a

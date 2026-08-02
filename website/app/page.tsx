@@ -16,11 +16,11 @@ const steps = [
     "Run it from the project.",
     "npx redev-cli@latest identifies the browser app that belongs to your current workspace.",
   ],
-  [
-    "02 / POINT",
-    "Open the editor proxy.",
-    "Redev injects the overlay locally and prints the exact URL to open. Hover for a style snapshot, then click anything.",
-  ],
+    [
+      "02 / POINT",
+      "Open the editor proxy.",
+      "Redev injects the overlay locally and prints the exact URL to open. Hover for a style snapshot, then click to open the Figma-style controls.",
+    ],
   [
     "03 / SHIP",
     "Describe and review.",
@@ -260,8 +260,8 @@ export default function HomePage() {
           </h1>
           <p className="mx-auto mt-6 max-w-[600px] text-[15px] leading-relaxed text-muted sm:text-[17px]">
             Redev finds the app you are working on, shows exact visual context
-            on hover, and lets your coding agent turn a visual problem into a
-            real source change.
+            on hover, and gives you a compact Figma-style inspector for direct
+            edits before your coding agent writes the source change.
           </p>
           <div className="mt-[30px] flex flex-wrap items-center justify-center gap-[18px]">
             <a
@@ -369,12 +369,16 @@ export default function HomePage() {
               </h3>
               <p className="max-w-[400px] text-sm leading-relaxed text-[#a9a9ac]">
                 Before you click, the browser shows the element’s selector,
-                dimensions, colors, typography, and spacing. Then your existing
-                coding agent edits the actual source.
+                dimensions, colors, typography, and spacing. Tune those values
+                directly, edit the generated request, and let your existing
+                coding agent write the actual source.
               </p>
               <div className="mt-7 flex flex-wrap gap-2 text-xs text-[#bebec2]">
                 <span className="rounded-full border border-[#444440] px-3 py-2">
                   hover style snapshot
+                </span>
+                <span className="rounded-full border border-[#444440] px-3 py-2">
+                  direct style controls
                 </span>
                 <span className="rounded-full border border-[#444440] px-3 py-2">
                   click element

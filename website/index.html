@@ -298,19 +298,13 @@
     <div class="mt-10 max-w-2xl term">
       <div class="row">
         <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-        <span class="cmd">npm i -D redev-cli redev-next</span>
-        <button class="copy" data-copy="npm i -D redev-cli redev-next">copy</button>
+        <span class="cmd">npx create-redev@latest</span>
+        <button class="copy" data-copy="npx create-redev@latest">copy</button>
       </div>
-      <div class="out">added 2 packages in 4s</div>
-      <div class="row mt-2">
-        <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-        <span class="cmd">npx redev-cli</span>
-        <button class="copy" data-copy="npx redev-cli">copy</button>
-      </div>
-      <div class="out">┌─ <span class="accent">redev running</span></div>
-      <div class="out">│  overlay served on :5050 · ws on :3001</div>
-      <div class="out">│  drop <span class="accent">&lt;RedevScript /&gt;</span> into your layout, then open your dev URL</div>
-      <div class="out">└─ press <span class="accent">Cmd+Shift+E</span> in the browser to start clicking<span class="caret"></span></div>
+      <div class="out">  <span class="dim">framework:</span> <span class="accent">Next.js</span>  <span class="dim">·</span>  <span class="dim">package manager:</span> <span class="accent">npm</span></div>
+      <div class="out">  installing redev-cli, redev-nextjs...</div>
+      <div class="out">  <span class="ok">✓</span> edited app/layout.tsx</div>
+      <div class="out">  <span class="ok">done.</span> next: <span class="accent">npm run dev</span> · <span class="accent">npx redev-cli</span> · press <span class="accent">Cmd+Shift+E</span><span class="caret"></span></div>
     </div>
 
     <div class="mt-8 flex flex-wrap gap-4 items-center">
@@ -373,70 +367,20 @@
 
 <!-- ═══════════════════════════════════════ HOW -->
 <section id="how" class="max-w-5xl mx-auto px-6 py-24">
-  <div class="gutter mb-10">
+  <div class="gutter mb-6">
     <div class="ln">03</div>
     <div>
       <div class="label mb-2"><span class="dot">§</span> how it works</div>
-      <h2 class="text-2xl md:text-3xl font-bold">Three pieces. Nothing in the cloud.</h2>
+      <h2 class="text-2xl md:text-3xl font-bold">Three pieces. All local.</h2>
     </div>
   </div>
 
   <div class="gutter">
     <div class="ln">·</div>
-    <div>
-      <!-- Vertical flow -->
-      <div class="grid md:grid-cols-[1fr_20px_1fr_20px_1fr] gap-0 items-stretch">
-
-        <!-- Piece 1 -->
-        <div class="border border-[color:var(--border-strong)] p-5">
-          <div class="text-[10px] tracking-widest uppercase" style="color: var(--text-dim);">daemon</div>
-          <div class="mt-1 font-bold" style="color: var(--accent);">redev-cli</div>
-          <div class="mt-3 text-[13px] leading-relaxed" style="color: var(--text-muted);">
-            A tiny local server. Serves the overlay JS, holds click state, talks to Claude Code (headless CLI or via MCP).
-          </div>
-          <div class="mt-4 text-[11px]" style="color: var(--text-dim);">
-            :5050 http · :3001 ws
-          </div>
-        </div>
-
-        <!-- connector -->
-        <div class="hidden md:flex items-center justify-center flow-line accent">──▶</div>
-        <div class="md:hidden flow-line accent py-2">│<br>▼</div>
-
-        <!-- Piece 2 -->
-        <div class="border border-[color:var(--border-strong)] p-5">
-          <div class="text-[10px] tracking-widest uppercase" style="color: var(--text-dim);">in-page overlay</div>
-          <div class="mt-1 font-bold" style="color: var(--accent);">&lt;RedevScript /&gt;</div>
-          <div class="mt-3 text-[13px] leading-relaxed" style="color: var(--text-muted);">
-            A dev-only script tag (or framework component). Highlights elements on hover, captures your prompt, sends it to the daemon.
-          </div>
-          <div class="mt-4 text-[11px]" style="color: var(--text-dim);">
-            renders nothing in prod
-          </div>
-        </div>
-
-        <div class="hidden md:flex items-center justify-center flow-line accent">──▶</div>
-        <div class="md:hidden flow-line accent py-2">│<br>▼</div>
-
-        <!-- Piece 3 -->
-        <div class="border border-[color:var(--border-strong)] p-5">
-          <div class="text-[10px] tracking-widest uppercase" style="color: var(--text-dim);">agent</div>
-          <div class="mt-1 font-bold" style="color: var(--accent);">Claude Code</div>
-          <div class="mt-3 text-[13px] leading-relaxed" style="color: var(--text-muted);">
-            Reads the element context + your prompt, edits your source file, writes done. Browser auto-reloads.
-          </div>
-          <div class="mt-4 text-[11px]" style="color: var(--text-dim);">
-            your existing subscription
-          </div>
-        </div>
-
-      </div>
-
-      <!-- annotation -->
-      <div class="mt-6 text-[12px]" style="color: var(--text-muted);">
-        <span style="color: var(--text-dim);">└─</span>
-        All three live on your machine. No code leaves your laptop. The daemon is 400 lines; the overlay is a single 16KB vanilla JS file with zero dependencies.
-      </div>
+    <div class="term text-[13px]">
+      <div><span style="color: var(--accent);">redev-cli</span>  <span style="color: var(--text-dim);">──▶</span>  <span style="color: var(--accent);">&lt;RedevScript /&gt;</span>  <span style="color: var(--text-dim);">──▶</span>  <span style="color: var(--accent);">Claude Code</span></div>
+      <div class="out mt-1">local daemon on :5050 · dev-only overlay in your app · your existing agent edits the file</div>
+      <div class="out">no cloud · 400-line daemon · 16KB overlay · zero deps</div>
     </div>
   </div>
 </section>
@@ -458,166 +402,89 @@
     </div>
   </div>
 
-  <!-- Prereq strip -->
-  <div class="gutter mb-8">
+  <!-- Prereqs (one line) -->
+  <div class="gutter mb-6">
     <div class="ln">·</div>
-    <div class="border border-[color:var(--border-strong)] diag p-5">
-      <div class="text-[11px] tracking-widest uppercase mb-3" style="color: var(--accent);">prerequisites</div>
-      <ul class="space-y-1.5 text-[13px]" style="color: var(--text-muted);">
-        <li><span style="color: var(--ok);">✓</span> node ≥ 18 · <code class="inline">node --version</code></li>
-        <li><span style="color: var(--ok);">✓</span> a running dev server on some localhost port</li>
-        <li><span style="color: var(--ok);">✓</span> <a class="link" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed and signed in · <code class="inline">claude --version</code></li>
-      </ul>
+    <div class="text-[12px]" style="color: var(--text-muted);">
+      <span style="color: var(--accent);">prereqs:</span> node ≥ 18 · a running dev server · <a class="link" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a> installed
     </div>
   </div>
 
-  <!-- Step 01 -->
-  <div class="gutter mb-8">
+  <!-- Step 01: one command -->
+  <div class="gutter mb-6">
     <div class="ln">01</div>
     <div>
-      <div class="text-[15px] font-bold mb-3">Install the daemon</div>
-      <div class="term">
-        <div class="row">
-          <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-          <span class="cmd">npm i -D redev-cli</span>
-          <button class="copy" data-copy="npm i -D redev-cli">copy</button>
-        </div>
-      </div>
-      <div class="mt-2 text-[12px]" style="color: var(--text-dim);">
-        └─ Ships as one binary. Bundles Ink, Express, WS, everything. No global install needed.
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 02 -->
-  <div class="gutter mb-8">
-    <div class="ln">02</div>
-    <div>
-      <div class="text-[15px] font-bold mb-3">Run it in a second terminal tab</div>
-      <div class="term">
-        <div class="row">
-          <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-          <span class="cmd">npx redev-cli</span>
-          <button class="copy" data-copy="npx redev-cli">copy</button>
-        </div>
-        <div class="out mt-2">┌─ <span class="accent">redev running</span></div>
-        <div class="out">│  http://localhost:5050  <span class="dim">(overlay + ws)</span></div>
-        <div class="out">└─ waiting for click...</div>
-      </div>
-      <div class="mt-2 text-[12px]" style="color: var(--text-dim);">
-        └─ Runs in the background. You never open this URL — it just serves the overlay script.
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 03 - framework tabs -->
-  <div class="gutter mb-4">
-    <div class="ln">03</div>
-    <div>
-      <div class="text-[15px] font-bold mb-3">Wire the overlay into your app <span style="color: var(--text-muted); font-weight: 400;">— pick your framework</span></div>
+      <div class="text-[15px] font-bold mb-3">Run one command <span style="color: var(--text-muted); font-weight: 400;">— pick your framework</span></div>
 
       <div class="flex flex-wrap gap-0" role="tablist">
         <button class="fw-tab active" data-tab="next" role="tab">Next.js</button>
         <button class="fw-tab" data-tab="vite" role="tab">Vite + React</button>
-        <button class="fw-tab" data-tab="other" role="tab">Astro / Svelte / Remix / other</button>
+        <button class="fw-tab" data-tab="other" role="tab">other</button>
       </div>
 
-      <!-- Next.js panel -->
       <div class="fw-panel active" data-panel="next">
-        <div class="text-[12px] mb-3" style="color: var(--text-muted);">
-          Install the companion component and drop it into your root layout. Ships nothing to production.
-        </div>
         <div class="term">
           <div class="row">
             <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-            <span class="cmd">npm i -D redev-next</span>
-            <button class="copy" data-copy="npm i -D redev-next">copy</button>
+            <span class="cmd">npx create-redev@latest</span>
+            <button class="copy" data-copy="npx create-redev@latest">copy</button>
           </div>
+          <div class="out mt-2">  <span class="dim">framework:</span> <span class="accent">Next.js</span>   <span class="dim">package manager:</span> <span class="accent">npm</span></div>
+          <div class="out">  installing redev-cli, redev-nextjs...</div>
+          <div class="out">  <span class="ok">✓</span> edited <span style="color: var(--text);">app/layout.tsx</span></div>
+          <div class="out">  <span class="ok">done.</span> start it: <span class="dim">npm run dev</span> · <span class="dim">npx redev-cli</span></div>
         </div>
-        <div class="mt-4 text-[12px]" style="color: var(--text-muted);">
-          Then in <code class="inline">app/layout.tsx</code>:
-        </div>
-        <div class="term mt-2">
-<pre style="margin:0; white-space: pre; color: var(--text);"><span style="color: var(--text-dim);">// app/layout.tsx</span>
-<span style="color: var(--accent);">import</span> { RedevScript } <span style="color: var(--accent);">from</span> <span style="color: var(--ok);">'redev-next'</span>
-
-<span style="color: var(--accent);">export default function</span> RootLayout({ children }) {
-  <span style="color: var(--accent);">return</span> (
-    &lt;html&gt;
-      &lt;body&gt;
-        {children}
-        <span style="background: rgba(232,185,35,0.15); padding: 0 2px;">&lt;RedevScript /&gt;</span>
-      &lt;/body&gt;
-    &lt;/html&gt;
-  )
-}</pre>
-          <div class="mt-3 pt-3 border-t border-[color:var(--border)]">
-            <button class="copy" data-copy="import { RedevScript } from 'redev-next'">copy import</button>
-          </div>
-        </div>
-        <div class="mt-3 text-[12px]" style="color: var(--text-dim);">
-          └─ Automatic dev-only. RSC-safe (no <code class="inline">'use client'</code> needed). Zero bundle in prod.
-        </div>
+        <div class="mt-2 text-[11px]" style="color: var(--text-dim);">detects your setup · installs redev-cli + redev-nextjs · adds &lt;RedevScript /&gt; to app/layout.tsx</div>
       </div>
 
-      <!-- Vite panel -->
       <div class="fw-panel" data-panel="vite">
-        <div class="text-[12px] mb-3" style="color: var(--text-muted);">
-          Install the Vite plugin. It auto-injects the overlay AND tags every JSX element with source-map attributes so Claude edits the exact file instantly (no grep).
-        </div>
         <div class="term">
           <div class="row">
             <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-            <span class="cmd">npm i -D redev-vite-plugin</span>
-            <button class="copy" data-copy="npm i -D redev-vite-plugin">copy</button>
+            <span class="cmd">npx create-redev@latest</span>
+            <button class="copy" data-copy="npx create-redev@latest">copy</button>
           </div>
+          <div class="out mt-2">  <span class="dim">framework:</span> <span class="accent">Vite</span>   <span class="dim">package manager:</span> <span class="accent">npm</span></div>
+          <div class="out">  installing redev-cli, redev-vite-plugin...</div>
+          <div class="out">  <span class="ok">✓</span> edited <span style="color: var(--text);">vite.config.ts</span></div>
+          <div class="out">  <span class="ok">done.</span> start it: <span class="dim">npm run dev</span> · <span class="dim">npx redev-cli</span></div>
         </div>
-        <div class="mt-4 text-[12px]" style="color: var(--text-muted);">
-          Then in <code class="inline">vite.config.js</code>:
-        </div>
-        <div class="term mt-2">
-<pre style="margin:0; white-space: pre; color: var(--text);"><span style="color: var(--accent);">import</span> { defineConfig } <span style="color: var(--accent);">from</span> <span style="color: var(--ok);">'vite'</span>
-<span style="color: var(--accent);">import</span> react <span style="color: var(--accent);">from</span> <span style="color: var(--ok);">'@vitejs/plugin-react'</span>
-<span style="color: var(--accent);">import</span> redev <span style="color: var(--accent);">from</span> <span style="color: var(--ok);">'redev-vite-plugin'</span>
-
-<span style="color: var(--accent);">export default</span> defineConfig({
-  plugins: [react(), <span style="background: rgba(232,185,35,0.15); padding: 0 2px;">redev()</span>]
-})</pre>
-        </div>
-        <div class="mt-3 text-[12px]" style="color: var(--text-dim);">
-          └─ Dev only. Production builds are byte-identical to without the plugin.
-        </div>
+        <div class="mt-2 text-[11px]" style="color: var(--text-dim);">installs redev-cli + redev-vite-plugin · adds redev() to vite.config · also maps clicks to exact file/line</div>
       </div>
 
-      <!-- Other panel -->
       <div class="fw-panel" data-panel="other">
-        <div class="text-[12px] mb-3" style="color: var(--text-muted);">
-          No companion package for your framework yet? Drop the raw script tag in your root template, wrapped in a dev-only check. Works with Astro, SvelteKit, Remix, Nuxt, plain HTML — anything that renders HTML.
-        </div>
         <div class="term">
-<pre style="margin:0; white-space: pre; color: var(--text);"><span style="color: var(--text-dim);">// e.g. Astro layout, wrapped for dev-only</span>
-{import.meta.env.DEV && (
-  &lt;<span style="color: var(--accent);">script</span> async src=<span style="color: var(--ok);">"http://localhost:5050/redev/overlay.js"</span> /&gt;
-)}</pre>
-          <div class="mt-3 pt-3 border-t border-[color:var(--border)]">
-            <button class="copy" data-copy='<script async src="http://localhost:5050/redev/overlay.js"></script>'>copy tag</button>
+          <div class="row">
+            <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
+            <span class="cmd">npx create-redev@latest --manual</span>
+            <button class="copy" data-copy="npx create-redev@latest --manual">copy</button>
           </div>
+          <div class="out mt-2">  installs redev-cli and prints:</div>
+          <div class="out mt-1">  <span class="accent">&lt;script async src="http://localhost:5050/redev/overlay.js"&gt;&lt;/script&gt;</span></div>
+          <div class="out">  <span class="dim">paste into your root template, wrapped in a dev-only check</span></div>
         </div>
-        <div class="mt-3 text-[12px]" style="color: var(--text-dim);">
-          └─ Missing your framework? <a class="link" href="https://github.com/abhishek4544/Redev/issues">Open an issue</a> — companions are ~12 lines of code, they ship fast.
-        </div>
+        <div class="mt-2 text-[11px]" style="color: var(--text-dim);">astro · sveltekit · remix · nuxt · plain html · <a class="link" href="https://github.com/abhishek4544/Redev/issues">request a framework</a></div>
       </div>
 
     </div>
   </div>
 
-  <!-- Then what -->
-  <div class="gutter mt-10">
-    <div class="ln">▸</div>
-    <div class="border-l-2 pl-5" style="border-color: var(--accent);">
-      <div class="text-[13px]" style="color: var(--text-muted);">
-        Now open <code class="inline">localhost:3000</code> (or wherever your app runs), press <kbd>Cmd+Shift+E</kbd>, click something, and type a change. That's it.
+  <!-- Step 02: run -->
+  <div class="gutter mb-4">
+    <div class="ln">02</div>
+    <div>
+      <div class="text-[15px] font-bold mb-3">Start it</div>
+      <div class="term">
+        <div class="out"><span class="dim">tab 1:</span> <span class="cmd">npm run dev</span></div>
+        <div class="out"><span class="dim">tab 2:</span> <span class="cmd">npx redev-cli</span></div>
       </div>
+    </div>
+  </div>
+
+  <div class="gutter mt-8">
+    <div class="ln">▸</div>
+    <div class="text-[13px]" style="color: var(--text-muted); border-left: 2px solid var(--accent); padding-left: 16px;">
+      Open <code class="inline">localhost:3000</code>, press <kbd>Cmd+Shift+E</kbd>, click, type a change. Done.
     </div>
   </div>
 </section>
@@ -639,7 +506,7 @@
   <div class="gutter mb-6">
     <div class="ln">·</div>
     <div class="text-[14px] leading-relaxed" style="color: var(--text-muted);">
-      The overlay is one JS file served from <code class="inline">localhost:5050</code>. You <em>can</em> load it with a raw <code class="inline">&lt;script&gt;</code> tag anywhere. The framework packages (<code class="inline">redev-next</code>, <code class="inline">redev-vite-plugin</code>) exist because doing it manually has three sharp edges that will bite you:
+      The overlay is one JS file served from <code class="inline">localhost:5050</code>. You <em>can</em> load it with a raw <code class="inline">&lt;script&gt;</code> tag anywhere. The framework packages (<code class="inline">redev-nextjs</code>, <code class="inline">redev-vite-plugin</code>) exist because doing it manually has three sharp edges that will bite you:
     </div>
   </div>
 
@@ -709,37 +576,15 @@
   <div class="gutter">
     <div class="ln">·</div>
     <div class="term text-[13px]">
-      <div class="row">
-        <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-        <span class="cmd">npm run dev</span>
-      </div>
-      <div class="out">  ready · localhost:3000 in 812ms</div>
+      <div class="out"><span style="color: var(--text-dim);">tab 1:</span> <span class="cmd">npm run dev</span></div>
+      <div class="out"><span style="color: var(--text-dim);">tab 2:</span> <span class="cmd">npx redev-cli</span></div>
+      <div class="out"><span style="color: var(--text-dim);">browser:</span> Cmd+Shift+E · click · <span style="color: var(--accent);">"bigger padding, add shadow"</span></div>
       <br>
-      <div class="row">
-        <span class="prompt-user">you</span><span class="prompt-path">~/app</span> <span style="color: var(--text-dim);">(tab 2)</span><span class="prompt">$</span>
-        <span class="cmd">npx redev-cli</span>
-      </div>
-      <div class="out">  ┌─ <span class="accent">redev running</span> · overlay :5050</div>
-      <div class="out">  └─ waiting for click...</div>
+      <div class="out">  <span class="ok">✓</span> Button.tsx edited · browser reloaded</div>
       <br>
-      <div class="out"><span style="color: var(--text-dim);"># browser: open localhost:3000, press Cmd+Shift+E, click the wrong padding</span></div>
-      <div class="out"><span style="color: var(--text-dim);"># overlay panel: "increase padding, add subtle shadow"</span></div>
-      <br>
-      <div class="out">  <span class="accent">▸</span> click received · <span class="dim">Button.tsx:24</span></div>
-      <div class="out">  <span class="accent">▸</span> dispatching to Claude Code...</div>
-      <div class="out">  <span class="ok">✓</span> edited Button.tsx (2 lines)</div>
-      <div class="out">  <span class="ok">✓</span> browser reloaded</div>
-      <br>
-      <div class="row">
-        <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-        <span class="cmd">git diff Button.tsx</span>
-      </div>
       <div class="out"><span style="color: var(--warn);">- className="p-2"</span></div>
       <div class="out"><span style="color: var(--ok);">+ className="p-4 shadow-md"</span></div>
-      <div class="row mt-2">
-        <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-        <span class="cmd">git commit -am "tighten button padding"<span class="caret"></span></span>
-      </div>
+      <div class="out mt-2"><span class="prompt">$</span> <span class="cmd">git commit -am "tighten button padding"<span class="caret"></span></span></div>
     </div>
   </div>
 
@@ -829,7 +674,7 @@
 
       <details class="border border-[color:var(--border-strong)] p-5">
         <summary class="flex items-center justify-between font-bold text-[14px]">
-          <span>The redev-next component API</span>
+          <span>The redev-nextjs component API</span>
           <span class="arrow"></span>
         </summary>
         <div class="mt-4 text-[13px] space-y-3" style="color: var(--text-muted);">
@@ -965,8 +810,8 @@
       <div class="term max-w-md">
         <div class="row">
           <span class="prompt-user">you</span><span class="prompt-path">~/app</span><span class="prompt">$</span>
-          <span class="cmd">npm i -D redev-cli redev-next</span>
-          <button class="copy" data-copy="npm i -D redev-cli redev-next">copy</button>
+          <span class="cmd">npx create-redev@latest</span>
+          <button class="copy" data-copy="npx create-redev@latest">copy</button>
         </div>
       </div>
       <div class="mt-6 flex gap-4 items-center text-[12px]" style="color: var(--text-muted);">

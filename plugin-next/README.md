@@ -1,11 +1,11 @@
-# redev-next
+# redev-nextjs
 
 Next.js companion for [`redev-cli`](https://www.npmjs.com/package/redev-cli) — click any element in your running Next app, describe the change, ship it.
 
 ## Install
 
 ```bash
-npm install --save-dev redev-next
+npm install --save-dev redev-nextjs
 ```
 
 ## Use
@@ -13,7 +13,7 @@ npm install --save-dev redev-next
 In `app/layout.tsx` (App Router) or `pages/_app.tsx` (Pages Router):
 
 ```tsx
-import { RedevScript } from 'redev-next';
+import { RedevScript } from 'redev-nextjs';
 
 export default function RootLayout({ children }) {
   return (

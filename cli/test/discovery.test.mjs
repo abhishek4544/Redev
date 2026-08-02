@@ -1,26 +1,11 @@
 import assert from 'node:assert/strict';
-import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 import test from 'node:test';
 import { discoverLocalApps } from '../dist/server/discovery.js';
 import { findSessionCandidate, loadProjectSession, saveProjectSession, sessionPath } from '../dist/server/session.js';
-
-const CHILD_SERVER = `
-  const http = require('node:http');
-  const kind = process.env.FIXTURE_KIND;
-  const html = kind === 'next'
-    ? '<!doctype html><html><head><script src="/_next/static/chunks/main.js"></script></head><body>Next fixture</body></html>'
-    : '<!doctype html><html><head><script type="module" src="/@vite/client"></script></head><body>Vite fixture</body></html>';
-  const server = http.createServer((_request, response) => {
-    response.writeHead(200, { 'content-type': 'text/html' });
-    response.end(html);
-  });
-  server.listen(0, '127.0.0.1', () => console.log(server.address().port));
-`;
 
 async function makeProject(name, dependencies) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), `redev-${name}-`));
@@ -29,26 +14,24 @@ async function makeProject(name, dependencies) {
 }
 
 async function startFixture(projectRoot, kind) {
-  const child = spawn(process.execPath, ['-e', CHILD_SERVER], {
-    cwd: projectRoot,
-    env: { ...process.env, FIXTURE_KIND: kind },
-    stdio: ['ignore', 'pipe', 'pipe'],
+  const html = kind === 'next'
+    ? '<!doctype html><html><head><script src="/_next/static/chunks/main.js"></script></head><body>Next fixture</body></html>'
+    : '<!doctype html><html><head><script type="module" src="/@vite/client"></script></head><body>Vite fixture</body></html>';
+  const server = http.createServer((_request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html' });
+    response.end(html);
   });
-  let output = '';
-  child.stdout.on('data', (chunk) => { output += chunk.toString(); });
-  await Promise.race([
-    once(child.stdout, 'data'),
-    once(child, 'error').then(([error]) => Promise.reject(error)),
-  ]);
-  const port = Number(output.trim());
-  if (!Number.isInteger(port)) throw new Error(`Fixture did not report a port: ${output}`);
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  const port = server.address().port;
 
   return {
     port,
-    listener: { pid: String(child.pid), command: 'node -e fixture-server', cwd: projectRoot, ports: [port] },
+    listener: { pid: `fixture-${port}`, command: 'node fixture-server', cwd: projectRoot, ports: [port] },
     async stop() {
-      child.kill();
-      await once(child, 'exit');
+      await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     },
   };
 }

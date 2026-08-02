@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #ffffff;
-  --ink: #000000;
-  --muted: #5f5f6b;
-  --line: #e5e5e8;
-  --card: #ffffff;
-  --orange: #8e8ea0;
-  --yellow: #f5f5f7;
-  --blue: #f7f7f9;
-  --green: #f1f1f4;
-  --lavender: #eeeef2;
-  --dark: #000000;
+  --paper: #f6f6f4;
+  --ink: #171717;
+  --muted: #70706c;
+  --line: #deded9;
+  --card: #fffefa;
+  --orange: #6f6d67;
+  --yellow: #e9e8e3;
+  --blue: #efefec;
+  --green: #e4e4df;
+  --lavender: #ecebe7;
+  --dark: #222221;
 }
 
 @theme inline {
@@ -26,31 +26,13 @@
   --color-green: var(--green);
   --color-lavender: var(--lavender);
   --color-dark: var(--dark);
-  --font-sans: system-ui, sans-serif;
-  --font-display: system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: system-ui, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-}
-a { text-decoration: none; transition: color 400ms ease, background-color 400ms ease, border-color 400ms ease; }
-button { font: inherit; transition: color 400ms ease, background-color 400ms ease, border-color 400ms ease; }
-::selection { background: var(--orange); color: #ffffff; }
-
-/* Design brief: 8px rhythm, system UI, 5px surfaces, flat elevation. */
-h1, h2, h3 { font-family: system-ui, sans-serif !important; line-height: 1.5 !important; }
-h1 { font-size: clamp(40px, 6vw, 48px) !important; font-weight: 700 !important; letter-spacing: -0.025em !important; }
-h2 { font-size: 32px !important; font-weight: 600 !important; letter-spacing: -0.015em !important; }
-h3 { font-size: 24px !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
-[class*="rounded-[24px]"], [class*="rounded-[32px]"], [class*="rounded-[18px]"], [class*="rounded-[14px]"], [class*="rounded-[13px]"], [class*="rounded-[10px]"], [class*="rounded-xl"] { border-radius: 5px !important; }
-[class*="shadow-"] { box-shadow: none !important; }
-[class*="backdrop-blur"] { backdrop-filter: none !important; }
-[class*="bg-[linear-gradient"] { background: #f7f7f9 !important; }
-:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif; }
+a { text-decoration: none; }
+button { font: inherit; }
+::selection { background: #d9d8d2; color: #171717; }

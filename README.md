@@ -86,8 +86,7 @@ Nothing runs on Redev servers. There is no Redev cloud.
 | `cli/` | `redev-cli` npm package — Ink TUI + bundled Express/WS backend |
 | `plugin/` | `redev-vite-plugin` npm package — Babel-based JSX transformer |
 | `backend/` | Standalone dev backend (mirror of what CLI bundles) |
-| `frontend/` | Example React app used for local development |
-| `website/` | Landing page (single HTML file) |
+| `website/` | The Next.js + React + TypeScript landing page |
 
 ---
 
@@ -103,8 +102,8 @@ cd backend && npm install && npm run dev
 # CLI (in another terminal)
 cd cli && npm install && npm run dev
 
-# Example React app
-cd frontend && npm install && npm run dev
+# Website
+cd website && npm install && npm run dev
 ```
 
 ---

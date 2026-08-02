@@ -19,7 +19,7 @@ cd Redev/potatoo-dev
 (cd backend && npm install)
 (cd cli && npm install)
 (cd plugin && npm install)
-(cd frontend && npm install)
+(cd website && npm install)
 ```
 
 ## Running end-to-end for development
@@ -30,14 +30,14 @@ Three terminal tabs:
 # 1. Dev backend (hot-reloadable — separate from CLI's bundled server)
 cd backend && npm run dev
 
-# 2. Example React app
-cd frontend && npm run dev
+# 2. Next.js website
+cd website && npm run dev
 
 # 3. Ink CLI
 cd cli && npm run dev
 ```
 
-Open `http://localhost:5173` (Vite's default), press **Cmd+Shift+E**, click something.
+Open the website URL printed by Next.js. The CLI's browser overlay can then attach to any supported local app you run separately.
 
 The `backend/` and `cli/src/server/` directories currently have separate copies of the same server code. When you change one, mirror to the other before publishing.
 

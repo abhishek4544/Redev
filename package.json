@@ -4,7 +4,6 @@
   "description": "Full-stack web application with React, Node.js, and Python",
   "private": true,
   "workspaces": [
-    "frontend",
     "backend"
   ],
   "scripts": {

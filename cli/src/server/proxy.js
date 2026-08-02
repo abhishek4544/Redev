@@ -50,7 +50,7 @@ export function makeAppProxy({ target, overlayPort }) {
  * Try common dev-server ports and return the first one that responds.
  * Returns null if none respond.
  */
-export async function detectDevServer(candidates = [5173, 3000, 4321, 4200, 8080, 3001]) {
+export async function detectDevServer(candidates = [5173, 3000, 3003, 4321, 4200, 8080, 3001]) {
   for (const port of candidates) {
     if (port === Number(process.env.REDEV_HTTP_PORT) || port === Number(process.env.REDEV_WS_PORT)) continue;
     try {

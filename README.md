@@ -6,7 +6,7 @@
 
 **Click any element in your running dev app. Describe the change. Ship it — via Claude Code, into your actual source.**
 
-Redev turns your Vite + React dev server into an editable surface. Point at what's wrong, type what you want, and Claude Code makes the edit and reloads your browser. Everything runs locally.
+Redev turns your Vite + React or Next.js dev server into an editable surface. Point at what's wrong, type what you want, and Claude Code makes the edit and reloads your browser. Everything runs locally.
 
 ---
 
@@ -39,6 +39,23 @@ npx redev      # terminal 2 — starts Redev backend + CLI
 Open your app. Press **Cmd+Shift+E**. Click something. A panel appears — type your change, copy the command Redev generates, paste it in a fresh terminal (or into your existing Claude Code chat).
 
 Claude Code edits the file. Your browser reloads. Your git diff is ready to commit.
+
+### Next.js / Surgical
+
+Use Redev's development proxy; it detects the app belonging to the current
+project and injects the overlay without a Vite plugin or Next.js dependency:
+
+```bash
+# Run from Surgical after its Next server starts
+npx redev-cli@latest
+
+# Open the Redev proxy, not the original Next server
+open http://localhost:5050
+```
+
+Press **Cmd+Shift+E**, then click an element. If multiple apps are running,
+Redev shows a chooser rather than attaching to the wrong project. You can
+override discovery with `npx redev-cli@latest --app http://localhost:3003`.
 
 ---
 

@@ -6,7 +6,8 @@ import { OVERLAY_SCRIPT } from './overlay-server/overlay-script.js';
 import { FileService } from './services/FileService.js';
 import { ChangeHandler } from './services/ChangeHandler.js';
 import { AgentSpawner } from './services/AgentSpawner.js';
-import { makeAppProxy, detectDevServer } from './proxy.js';
+import { makeAppProxy } from './proxy.js';
+import { discoverLocalApps } from './discovery.js';
 
 function isPortFree(port) {
   return new Promise((resolve) => {
@@ -95,11 +96,14 @@ export async function startRedevServer({
   let sharedProxy = null;
   if (proxyMode) {
     if (!proxyTarget) {
-      const detected = await detectDevServer();
-      if (detected) {
-        resolvedProxyTarget = `http://localhost:${detected}`;
+      const discovery = await discoverLocalApps({ projectRoot });
+      if (discovery.recommendation) {
+        resolvedProxyTarget = discovery.recommendation.baseUrl;
+        log(`[Redev] Auto-selected ${discovery.recommendation.framework} at ${resolvedProxyTarget} (${discovery.recommendation.confidence}% confidence).`);
+      } else if (discovery.candidates.length > 0) {
+        log(`[Redev] Multiple or low-confidence local apps found. Run \`npx redev --app <URL>\` to choose one.`);
       } else {
-        log(`[Redev] No dev server detected on common ports. Start yours (e.g. \`npm run dev\`) then reload. Or pass --proxy <URL>.`);
+        log(`[Redev] No project-matched dev server detected. Start your app, then run \`npx redev\` again or pass \`--app <URL>\`.`);
       }
     } else {
       resolvedProxyTarget = proxyTarget;
@@ -122,8 +126,7 @@ export async function startRedevServer({
     log('');
     log(`     ${scriptTag}`);
     log('');
-    log(`   Then open YOUR dev URL as usual (e.g. http://localhost:3000,`);
-    log(`   http://localhost:5173) and press Cmd+Shift+E to click-to-edit.`);
+    log(`   Then open YOUR dev URL as usual and press Cmd+Shift+E to click-to-edit.`);
     if (proxyMode && resolvedProxyTarget) {
       log('');
       log(`   (Optional zero-config proxy: http://localhost:${httpPort} → ${resolvedProxyTarget})`);

@@ -1,6 +1,6 @@
 {
   "name": "redev-cli",
-  "version": "0.3.1",
+  "version": "0.3.4",
   "description": "Terminal-first click-to-edit tool. Click any element in your dev app, describe the change, ship it via Claude Code.",
   "keywords": [
     "cli",
@@ -16,6 +16,7 @@
   "type": "module",
   "bin": {
     "redev": "dist/index.js",
+    "redev-cli": "dist/index.js",
     "redev-mcp": "dist/mcp/redev-mcp.js"
   },
   "main": "dist/index.js",
@@ -28,6 +29,7 @@
   "scripts": {
     "dev": "tsx src/index.tsx",
     "build": "tsc && chmod +x dist/index.js dist/mcp/redev-mcp.js",
+    "test": "npm run build && node --test test/discovery.test.mjs",
     "start": "node dist/index.js",
     "demo": "tsx src/index.tsx --demo",
     "prepublishOnly": "npm run build"

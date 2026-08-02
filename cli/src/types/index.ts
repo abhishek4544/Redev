@@ -8,6 +8,8 @@ export interface SelectedElement {
   classes: string[];
   props: Record<string, string>;
   confidence: number;
+  componentScopeAvailable?: boolean;
+  editScope?: 'component' | 'instance';
 }
 
 export interface CodeChange {

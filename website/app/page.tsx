@@ -246,7 +246,7 @@ export default function HomePage() {
         </nav>
         <a
           href="#install"
-          className="rounded-full bg-ink px-[17px] py-[11px] text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-[0_9px_22px_rgba(23,23,23,0.14)]"
+          className="rounded-full bg-orange px-[17px] py-[11px] text-[13px] font-semibold text-white transition hover:bg-ink"
         >
           Try it free&nbsp; ↗
         </a>
@@ -266,7 +266,7 @@ export default function HomePage() {
           <div className="mt-[30px] flex flex-wrap items-center justify-center gap-[18px]">
             <a
               href="#install"
-              className="rounded-full bg-ink px-[18px] py-3 text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-[0_9px_22px_rgba(23,23,23,0.14)]"
+              className="rounded-full bg-orange px-[18px] py-3 text-[13px] font-semibold text-white transition hover:bg-ink"
             >
               Start with one command&nbsp; →
             </a>

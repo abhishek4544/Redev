@@ -64,6 +64,14 @@ instead. Use an explicit app URL only when you want to override discovery:
 npx redev-cli@latest --app http://localhost:3003
 ```
 
+## Shared components
+
+When Redev can map a selected element to a reusable React component, the
+inspector defaults to **Shared component**. Changes then target that component
+source, so every instance updates consistently. Choose **This instance only**
+when you need a local exception; Redev passes that scope directly to the agent
+instead of guessing.
+
 ### CLI options
 
 ```bash

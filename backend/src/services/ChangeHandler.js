@@ -42,14 +42,22 @@ export class ChangeHandler {
   }
 
   async handleChangeRequest(message, source = 'cli') {
-    const element = this.pendingElement;
-    if (!element) {
+    const pendingElement = this.pendingElement;
+    if (!pendingElement) {
       this.sendCli({
         type: 'change-generated',
         error: 'No element selected. Click an element in the browser first.',
       });
       return;
     }
+
+    const requestedScope = message.editScope;
+    const editScope = requestedScope === 'component' || requestedScope === 'instance'
+      ? requestedScope
+      : pendingElement.editScope === 'component' || pendingElement.editScope === 'instance'
+        ? pendingElement.editScope
+        : pendingElement.componentScopeAvailable ? 'component' : 'instance';
+    const element = { ...pendingElement, editScope };
 
     if (!this.fileService.projectRoot) {
       this.sendCli({
@@ -124,12 +132,18 @@ export class ChangeHandler {
   }
 
   buildInstruction(element, prompt) {
+    const sharedComponentScope = element.editScope === 'component' && element.componentScopeAvailable;
+    const scopeHint = sharedComponentScope
+      ? `**Edit scope:** Shared component. Update the ${element.component} source so every instance of it receives this change. Do not add a one-off override at only the clicked usage.`
+      : `**Edit scope:** This instance only. Apply a local override at the clicked usage and do not change reusable component defaults.`;
+
     return [
       `A user clicked a UI element in their running app and asked for a change.`,
       ``,
       `**Target element:** <${element.tagName}> at ${element.file}:${element.line}`,
       `**Enclosing component:** ${element.component}`,
       `**Current classes:** ${element.classes.join(' ') || '(none)'}`,
+      scopeHint,
       ``,
       `**User request:** "${prompt}"`,
       ``,
